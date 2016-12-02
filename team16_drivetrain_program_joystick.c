@@ -39,8 +39,7 @@ task main()
 				leftspeed =vexRT[Ch4];
 				backspeed =vexRT[Ch4];
 			}
-			else
-				if(abs(vexRT[Ch1])>DEADBAND)
+			else if(abs(vexRT[Ch1])>DEADBAND)
 			{
 				frontspeed =vexRT[Ch1];
 				backspeed =-vexRT[Ch1];
@@ -58,34 +57,27 @@ task main()
 		{
 			claw = -100;
 		}
-		else
-		{
-			claw = 0;
-		}
-		if(vexRT[Btn8DXmtr2] ==1)
-		{
-			claw = -100;
-		}
-		else
-		{
-			claw = 0;
-		}
+		else if(vexRT[Btn8DXmtr2] ==1);
+	{
+	  claw = 100;
+	}
+	else
+	{
+	  claw = 0;
+	}
 		if(vexRT[Btn7UXmtr2] ==1)
 		{
 			arm = 127;
 		}
-		else
+		else if(vexRT[Btn7DXmtr2] ==1)
 		{
-			arm = 0;
-		}
-		if(vexRT[Btn7DXmtr2] ==1)
-		{
-			arm = -127;
+		  arm = -127;
 		}
 		else
 		{
-			arm = 0;
+		  arm = 0;
 		}
+
 		motor[right] = rightspeed;
 		motor[left] = leftspeed;
 		motor[front] = frontspeed;
