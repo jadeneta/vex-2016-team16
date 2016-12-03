@@ -1,4 +1,6 @@
-#pragma config(Sensor, dgtl2,  ,               sensorQuadEncoder)
+#pragma config(Sensor, dgtl1,  rightshaft,     sensorQuadEncoder)
+#pragma config(Sensor, dgtl3,  leftshaft,      sensorQuadEncoder)
+#pragma config(Sensor, dgtl12, touch,          sensorTouch)
 #pragma config(Motor,  port1,           righttop,      tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           left,          tmotorVex393_MC29, openLoop, driveRight)
 #pragma config(Motor,  port3,           front,         tmotorVex393_MC29, openLoop, driveRight)
@@ -51,13 +53,45 @@ task main()
 				leftspeed =0;
 				rightspeed =0;
 			}
+			if(SensorValue[touch] == 1)
+			{
+			arm = 0;
+      }
+      else
+      {
+      }
+	  }
+	  if(vexRT[Btn7RXmtr2] == 1)
+	  {
+	    if(SensorValue[rightshaft] > 30)
+	    {
+	      arm = 30;
+	    }
+	    else if(SensorValue[rightshaft] < 30)
+	    {
+	      arm = -30;
+	    }
+	    else
+	    {
+	    }
 
-		}
+	    if(SensorValue[leftshaft] > 30)
+	    {
+	      arm = 30;
+	    }
+	    else if(SensorValue[leftshaft] < 30)
+	    {
+	      arm = -30;
+	    }
+	    else
+	    {
+	    }
+	  }
 		if(vexRT[Btn8UXmtr2] ==1)
 		{
 			claw = -100;
 		}
-		else if(vexRT[Btn8DXmtr2] ==1);
+		else if(vexRT[Btn8DXmtr2] ==1)
 	{
 	  claw = 100;
 	}
