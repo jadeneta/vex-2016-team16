@@ -1,13 +1,15 @@
+#pragma config(I2C_Usage, I2C1, i2cSensors)
 #pragma config(Sensor, dgtl1,  rightshaft,     sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  leftshaft,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl12, touch,          sensorTouch)
+#pragma config(Sensor, I2C_1,  leftclaw,       sensorQuadEncoderOnI2CPort,    , AutoAssign )
 #pragma config(Motor,  port1,           righttop,      tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           left,          tmotorVex393_MC29, openLoop, driveRight)
 #pragma config(Motor,  port3,           front,         tmotorVex393_MC29, openLoop, driveRight)
 #pragma config(Motor,  port4,           rightbottom,   tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port5,           lefttop,       tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port6,           leftclaw,      tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port7,           rightclaw,     tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port6,           leftclaw,      tmotorVex393_MC29, PIDControl, encoderPort, I2C_1)
+#pragma config(Motor,  port7,           rightclaw,     tmotorVex393_MC29, PIDControl, reversed, encoderPort, I2C_1)
 #pragma config(Motor,  port8,           right,         tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port9,           back,          tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port10,          leftbottom,    tmotorVex393_HBridge, openLoop)
@@ -66,7 +68,7 @@ task main()
 	    if(SensorValue[rightshaft] > 30)
 	    {
 	      arm = 30;
-	    }
+	    } //lucky number
 	    else if(SensorValue[rightshaft] < 30)
 	    {
 	      arm = -30;
@@ -89,11 +91,11 @@ task main()
 	  }
 		if(vexRT[Btn8UXmtr2] ==1)
 		{
-			claw = -100;
+			claw = -60;
 		}
 		else if(vexRT[Btn8DXmtr2] ==1)
 	{
-	  claw = 100;
+	  claw = 60;
 	}
 	else
 	{
@@ -122,5 +124,5 @@ task main()
 		motor[rightbottom] = arm;
 		motor[lefttop] = arm;
 		motor[leftbottom] = arm;
-	}
+	} //motor max power ;-;
 }
