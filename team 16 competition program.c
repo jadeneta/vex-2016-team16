@@ -20,9 +20,8 @@
 #pragma competitionControl(Competition)
 #pragma autonomousDuration(300)
 #pragma userControlDuration(900)
-
+#include "slew motor program.c"
 #include "Vex_Competition_Includes.c"   //Main competition background code...do not modify!
-
 /////////////////////////////////////////////////////////////////////////////////////////
 //
 //                          Pre-Autonomous Functions
@@ -49,6 +48,7 @@ void pre_auton()
 
 task autonomous()
 {
+  startTask(MotorSlewRateTask);
 //  int rightspeed=0;
 //  int leftspeed=0;
 	int turnspeedratio=0.5;
@@ -56,38 +56,38 @@ task autonomous()
   int backspeed=0;
   int claw=0;
   int arm=0;
-  motor(left) = 127;
-  motor(right) = -127;
+  motorReq[left] = 127;
+  motorReq[right] = -127;
   wait(2);
-  motor(left) = 0;
-  motor(right) = 0;
+  motorReq[left] = 0;
+  motorReq[right] = 0;
   backspeed = 127;
   frontspeed = 127;
-  motor[front] = frontspeed;
-  motor[back] = backspeed;
+  motorReq[front] = frontspeed;
+  motorReq[back] = backspeed;
   wait(.5);
   frontspeed = 0;
   backspeed = 0;
-  motor[front] = frontspeed;
-  motor[back] = backspeed;
+  motorReq[front] = frontspeed;
+  motorReq[back] = backspeed;
   arm = 127;
-  motor[rightlift] = arm;
-  motor[leftlift] = arm;
+  motorReq[rightlift] = arm;
+  motorReq[leftlift] = arm;
   wait(2);
   arm = 0;
-  motor[rightlift] = arm;
-  motor[leftlift] = arm;
+  motorReq[rightlift] = arm;
+  motorReq[leftlift] = arm;
   claw = -127;
-  motor[rightclaw] = claw;
-  motor[leftclaw] = claw;
+  motorReq[rightclaw] = claw;
+  motorReq[leftclaw] = claw;
   wait(1);
   claw = 127;
-  motor[rightclaw] = claw;
-  motor[leftclaw] = claw;
+  motorReq[rightclaw] = claw;
+  motorReq[leftclaw] = claw;
   wait(1);
   claw = 0;
-  motor[rightclaw] = claw;
-  motor[leftclaw] = claw;
+  motorReq[rightclaw] = claw;
+  motorReq[leftclaw] = claw;
 
 }
 
@@ -103,7 +103,7 @@ task autonomous()
 task usercontrol()
 {
   // User control code here, inside the loop
-
+  startTask(MotorSlewRateTask);
   float turnspeedratio=0.3;
   int clawOpenSpeed=50;
   int clawCloseSpeed=127;
@@ -188,7 +188,8 @@ task usercontrol()
     	if(SensorValue[touch] == 1)
     	{
       	arm = 0;
-
+        claw = clawOpenSpeed;
+        clawGrab=false;
     	} else {
       	arm = 127;
     	}
@@ -203,14 +204,17 @@ task usercontrol()
       arm = 0;
     }
 
-    motor[right] = rightspeed;
-    motor[left] = leftspeed;
-    motor[front] = frontspeed;
-    motor[back] = backspeed;
-    motor[rightclaw] = claw;
-    motor[leftclaw] = claw;
-    motor[rightlift] = arm;
-    motor[leftlift] = arm;
+    motorReq[right] = rightspeed;
+    motorReq[left] = leftspeed;
+    motorReq[front] = frontspeed;
+    motorReq[back] = backspeed;
+    motorReq[rightclaw] = claw;
+    motorReq[leftclaw] = claw;
+    motorReq[rightlift] = arm;
+    motorReq[leftlift] = arm;
+
+    wait1Msec( MOTOR_TASK_DELAY );
+
   }
 }
   // motor max power ;-;
