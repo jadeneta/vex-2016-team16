@@ -92,6 +92,7 @@ task arm_Control() {
     if (arm > 127) {
       arm = 127;
     }
+    if (abs(arm) < 20) arm = 0;
     if (arm < -127) arm = -127;
     motorReq[rightlift] = arm;
     motorReq[leftlift] = arm;
@@ -184,16 +185,15 @@ task usercontrol() {
     int leftFspeed = 0;
     int rightFspeed = 0;
     int rightBspeed = 0;
-    if (vexRT[Btn5U] == 1) {
-      auto();
-    }
+   // if (vexRT[Btn5U] == 1) {
+    //  auto();
+   // }
 
     // Turn left-right
     if (abs(vexRT[Ch4]) > DEADBAND) {
-      leftBspeed = vexRT[Ch4];
-      leftFspeed = vexRT[Ch4];
-      rightBspeed = vexRT[Ch4];
-      rightFspeed = vexRT[Ch4];
+      leftBspeed = vexRT[Ch4]/2;     leftFspeed = vexRT[Ch4]/2;
+      rightBspeed = vexRT[Ch4]/2;
+      rightFspeed = vexRT[Ch4]/2;
       } else {
       // Move Forward/Backward
       if (abs(vexRT[Ch2]) > DEADBAND) {
@@ -244,7 +244,7 @@ task usercontrol() {
 
     // Drop Lift
     else if (vexRT[Btn7DXmtr2] == 1) {
-      armtarget = max(950,armtarget-50);
+      armtarget = max(950,armtarget-25);
       lifthold = true;
     }
 
@@ -275,7 +275,7 @@ task usercontrol() {
     }
     */
  motorReq[backwheel] = backwheelspeed; // arm Sensor max value 2700(top) min value 950(bottom)
-    motorReq[leftbackwheel] = leftBspeed;// claw closed 2940 claw middle 1190
+    motorReq[leftbackwheel] = leftBspeed;// claw closed 2870 claw middle 1190
     motorReq[leftfrontwheel] = leftFspeed;
     motorReq[rightfrontwheel] = rightFspeed;
     motorReq[rightbackwheel]= rightBspeed;
