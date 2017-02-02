@@ -5,10 +5,8 @@
 #pragma config(Sensor, dgtl11, rightauto, sensorDigitalIn)
 #pragma config(Sensor, dgtl12, skill, sensorDigitalIn)
 #pragma config(Motor, port1, , tmotorVex393_HBridge, openLoop)
-#pragma config(Motor, port2, rightbackwheel, tmotorVex393_MC29, openLoop,      \
-               driveRight)
-#pragma config(Motor, port3, rightfrontwheel, tmotorVex393_MC29, openLoop,     \
-               driveRight)
+#pragma config(Motor, port2, rightbackwheel, tmotorVex393_MC29, openLoop,driveRight)
+#pragma config(Motor, port3, rightfrontwheel, tmotorVex393_MC29, openLoop,driveRight)
 #pragma config(Motor, port4, leftlift, tmotorVex393_MC29, openLoop)
 #pragma config(Motor, port5, backwheel, tmotorVex393_MC29, openLoop)
 #pragma config(Motor, port6, leftbackwheel, tmotorVex393_MC29, openLoop)
@@ -115,29 +113,54 @@ void autoleft();
 void autoskill();
 void autoright();
 void auto();
-void moveforward(int forward) {
-  motorReq[leftfrontwheel] = forward;
-  motorReq[leftbackwheel] = forward;
+void moveforward_right(int forward) {
+
   motorReq[rightfrontwheel] = -forward;
   motorReq[rightbackwheel] = -forward;
 }
-void movebackward(int backward) {
+void moveforward_left(int forward) {
+  motorReq[leftfrontwheel] = forward;
+  motorReq[leftbackwheel] = forward;
+}
+void moveforward(int forward) {
+  moveforward_left(forward);
+  moveforward_right(forward);
+}
+void movebackward_left(int backward) {
   motorReq[leftfrontwheel] = -backward;
   motorReq[leftbackwheel] = -backward;
+}
+void movebackward_right(int backward) {
   motorReq[rightfrontwheel] = backward;
   motorReq[rightbackwheel] = backward;
 }
-void turnleft(int left) {
+void movebackward(int backward) {
+  movebackward_right(backward);
+  movebackward_left(backward);
+}
+void turnleft_left(int left) {
   motorReq[leftfrontwheel] = -left;
   motorReq[leftbackwheel] = -left;
+}
+void turnleft_right(int left) {
   motorReq[rightfrontwheel] = -left;
   motorReq[rightbackwheel] = -left;
 }
-void turnright(int right) {
+void turnleft(int left) {
+  turnleft_right(left);
+  turnleft_left(left);
+}
+void turnright_left(int right) {
   motorReq[leftfrontwheel] = right;
   motorReq[leftbackwheel] = right;
+}
+void turnright_right(int right) {
   motorReq[rightfrontwheel] = right;
   motorReq[rightbackwheel] = right;
+}
+void turnright(int right) {
+  turnright_right(right);
+  turnright_left(right);
 }
 void closeclaw() { clawtarget = CLAW_CLOSE; }
 void openclaw() { clawtarget = CLAW_OPEN; }
@@ -147,65 +170,170 @@ void setArmPower(int speed) {
   // motorReq[leftclaw] = speed;
   motorReq[claw] = speed;
 }
+
 void moveForwardWithSensor(int rotations) {
   SensorValue[leftshaft] = 0;
+  SensorValue[rightshaft] = 0;
+  int min_leftpower = 25;
+  int min_rightpower = 25;
+  int lastSensorValueRight = 0;
+  int lastSensorValueLeft = 0;
 
-  while (SensorValue[leftshaft] < rotations) {
-    int error = rotations - SensorValue[leftshaft];
-    int power = error / 2;
-    if (power < 40)
-      power = 40;
+  while ((SensorValue[leftshaft] < rotations) ||
+         (SensorValue[rightshaft] < rotations)) {
+    int leftpower = 0;
+    int rightpower = 0;
+    if (SensorValue[leftshaft] < rotations) {
 
-    moveforward(min(127, power));
+      int error = rotations - SensorValue[leftshaft];
 
+      leftpower = error / 2;
+      if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+        min_leftpower += 5;
+      if (leftpower < min_leftpower)
+        leftpower = min_leftpower;
+      leftpower = min(127, leftpower)
+    }
+    if (SensorValue[rightshaft] < rotations) {
+
+      int error = rotations - SensorValue[rightshaft];
+
+      rightpower = error / 2;
+      if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+        min_rightpower += 5;
+      if (rightpower < min_rightpower)
+        rightpower = min_rightpower;
+      rightpower = min(127, rightpower)
+    }
+
+    moveforward_left(leftpower);
+    moveforward_right(rightpower);
+    lastSensorValueLeft = abs(SensorValue[leftshaft]);
+    lastSensorValueRight = abs(SensorValue[rightshaft]);
     wait1Msec(MOTOR_TASK_DELAY);
   }
   moveforward(0);
 }
 void turnRightWithSensor(int rotations) {
   SensorValue[leftshaft] = 0;
+  SensorValue[rightshaft] = 0;
+  int min_rightpower = 25;
+  int min_leftpower = 25;
+  int lastSensorValueRight = 0;
+  int lastSensorValueLeft = 0;
 
-  while (SensorValue[leftshaft] < rotations) {
-    int error = rotations - SensorValue[leftshaft];
-    int power = error / 2;
-    if (power < 40)
-      power = 40;
+  while ((SensorValue[leftshaft] < rotations) ||
+         (SensorValue[rightshaft] < rotations)) {
+    int leftpower = 0;
+    int rightpower = 0;
+    if (SensorValue[leftshaft] < rotations) {
 
-    turnright(min(127, power));
+      int error = rotations - SensorValue[leftshaft];
 
+      leftpower = error / 2;
+      if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+        min_leftpower += 5;
+      if (leftpower < min_leftpower)
+        leftpower = min_leftpower;
+      leftpower = min(127, leftpower)
+    }
+    if (SensorValue[rightshaft] < rotations) {
+
+      int error = rotations - SensorValue[rightshaft];
+
+      rightpower = error / 2;
+      if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+        min_rightpower += 5;
+      if (rightpower < min_rightpower)
+        rightpower = min_rightpower;
+      rightpower = min(127, rightpower)
+    }
+    turnright_left(leftpower);
+    turnright_right(rightpower);
+    lastSensorValueLeft = abs(SensorValue[leftshaft]);
+    lastSensorValueRight = abs(SensorValue[rightshaft]);
     wait1Msec(MOTOR_TASK_DELAY);
   }
   turnright(0);
 }
 void moveBackwardWithSensor(int rotations) {
   SensorValue[leftshaft] = 0;
-  while (abs(SensorValue[leftshaft]) < rotations) {
-    int error = rotations - abs(SensorValue[leftshaft]);
+  SensorValue[rightshaft] = 0;
+  int min_leftpower = 25;
+  int min_rightpower = 25;
+  int lastSensorValueLeft = 0;
+  int lastSensorValueRight = 0;
+  while ((abs(SensorValue[leftshaft]) < rotations) ||
+         (abs(SensorValue[rightshaft]) < rotations)) {
+    int leftpower = 0;
+    int rightpower = 0;
+    if (abs(SensorValue[leftshaft]) < rotations) {
 
-    int power = error / 2;
-    if (power < 40)
-      power = 40;
+      int error = rotations - abs(SensorValue[leftshaft]);
 
-    movebackward(min(127, power));
+      leftpower = error / 2;
+      if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+        min_leftpower += 5;
+      if (leftpower < min_leftpower)
+        leftpower = min_leftpower;
+      leftpower = min(127, leftpower)
+    }
+    if (abs(SensorValue[rightshaft]) < rotations) {
 
+      int error = rotations - abs(SensorValue[rightshaft]);
+
+      rightpower = error / 2;
+      if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+        min_rightpower += 5;
+      if (rightpower < min_rightpower)
+        rightpower = min_rightpower;
+      rightpower = min(127, rightpower)
+    }
+    movebackward_left(leftpower);
+    movebackward_right(rightpower);
+    lastSensorValueLeft = abs(SensorValue[leftshaft]);
+    lastSensorValueRight = abs(SensorValue[rightshaft]);
     wait1Msec(MOTOR_TASK_DELAY);
   }
   movebackward(0);
 }
 void turnLeftWithSensor(int rotations) {
   SensorValue[leftshaft] = 0;
-  int min_power = 25;
-  int lastSensorValue = 0;
-  while (abs(SensorValue[leftshaft]) < rotations) {
-    int error = rotations - abs(SensorValue[leftshaft]);
-    int power = error / 2;
-    if (abs(SensorValue[leftshaft]) == lastSensorValue)
-      min_power += 5;
-    if (power < min_power)
-      power = min_power;
+  SensorValue[rightshaft] = 0;
+  int min_leftpower = 25;
+  int min_rightpower = 25;
+  int lastSensorValueLeft = 0;
+  int lastSensorValueRight = 0;
+  while ((abs(SensorValue[leftshaft]) < rotations) ||
+         (abs(SensorValue[rightshaft]) < rotations)) {
+    int leftpower = 0;
+    int rightpower = 0;
+    if (abs(SensorValue[leftshaft]) < rotations) {
 
-    turnleft(min(127, power));
-    lastSensorValue = abs(SensorValue[leftshaft]);
+      int error = rotations - abs(SensorValue[leftshaft]);
+
+      leftpower = error / 2;
+      if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+        min_leftpower += 5;
+      if (leftpower < min_leftpower)
+        leftpower = min_leftpower;
+      leftpower = min(127, leftpower)
+    }
+    if (abs(SensorValue[rightshaft]) < rotations) {
+
+      int error = rotations - abs(SensorValue[rightshaft]);
+
+      rightpower = error / 2;
+      if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+        min_rightpower += 5;
+      if (rightpower < min_rightpower)
+        rightpower = min_rightpower;
+      rightpower = min(127, rightpower)
+    }
+    turnleft_left(leftpower);
+    turnleft_right(rightpower);
+    lastSensorValueLeft = abs(SensorValue[leftshaft]);
+    lastSensorValueRight = abs(SensorValue[rightshaft]);
     wait1Msec(MOTOR_TASK_DELAY);
   }
   turnleft(0);
@@ -532,4 +660,4 @@ task usercontrol() {
     wait1Msec(MOTOR_TASK_DELAY);
   }
 }
-// motor max power ;-;
+// motor max power ;-
