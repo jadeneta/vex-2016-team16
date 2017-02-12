@@ -1,0 +1,7 @@
+moveForwardWithSensor() {
+
+  if the (abs)current value of the sensor is not equal to the target value
+    moveforward by the (abs)current value minus the (abs)target value
+
+      wait for about 20 milisecs so the motors dont burn out
+}

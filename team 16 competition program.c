@@ -4,13 +4,14 @@
 #pragma config(Sensor, dgtl3,  leftshaft,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  right_led,      sensorLEDtoVCC)
 #pragma config(Sensor, dgtl6,  skill_led,      sensorLEDtoVCC)
+#pragma config(Sensor, dgtl10, hangtoplimit,   sensorTouch)
 #pragma config(Sensor, dgtl11, rightauto,      sensorTouch)
 #pragma config(Sensor, dgtl12, skill,          sensorTouch)
 #pragma config(Motor,  port1,            ,             tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           rightbackwheel, tmotorVex393_MC29, openLoop, driveRight)
 #pragma config(Motor,  port3,           rightfrontwheel, tmotorVex393_MC29, openLoop, driveRight)
 #pragma config(Motor,  port4,           leftlift,      tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port5,           backwheel,     tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port5,           hang,          tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port6,           leftbackwheel, tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port7,           leftfrontwheel, tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port8,           claw,          tmotorVex393_MC29, openLoop)
@@ -48,24 +49,24 @@ const int TURNRIGHT_90 = 311;
 /////////////////////////////////////////////////////////////////////////////////////////
 
 void pre_auton() {
-  SensorValue[skill_led] = 0;
-  SensorValue[right_led] = 0;
-if(SensorValue[skill] == 1) SensorValue[skill_led] = 1;
- else if (SensorValue[rightauto] == 1) SensorValue[right_led] = 1;
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+	SensorValue[skill_led] = 0;
+	SensorValue[right_led] = 0;
+	if(SensorValue[skill] == 1) SensorValue[skill_led] = 1;
+	else if (SensorValue[rightauto] == 1) SensorValue[right_led] = 1;
+	// All activities that occur before the competition starts
+	// Example: clearing encoders, setting servo positions, ...
 }
 
 int min(int a, int b) {
-  if (a > b)
-    return b;
-  return a;
+	if (a > b)
+		return b;
+	return a;
 }
 
 int max(int a, int b) {
-  if (a > b)
-    return a;
-  return b;
+	if (a > b)
+		return a;
+	return b;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -78,43 +79,43 @@ int max(int a, int b) {
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 task claw_Control() {
-  while (true) {
+	while (true) {
 
-    int currentvalue = SensorValue[clawSensor];
-    int clawerror = clawtarget - abs(currentvalue);
-    motorReq[claw] = clawerror / 5;
-    if (clawerror > 127) {
-      clawerror = 127;
-    }
-    if (clawerror < -127)
-      clawerror = -127;
+		int currentvalue = SensorValue[clawSensor];
+		int clawerror = clawtarget - abs(currentvalue);
+		motorReq[claw] = clawerror / 5;
+		if (clawerror > 127) {
+			clawerror = 127;
+		}
+		if (clawerror < -127)
+			clawerror = -127;
 
-    wait1Msec(MOTOR_TASK_DELAY);
-  }
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
 }
 task arm_Control() {
-  int arm = 0;
+	int arm = 0;
 
-  int armerror = 0;
+	int armerror = 0;
 
-  while (true) {
-    if(lifthold)
-  {
-      int currentvalue = SensorValue[liftSensor];
-      armerror = armtarget - abs(currentvalue);
-      arm = armerror / 5;
-      if (arm > 127) {
-        arm = 127;
-      }
-      if (abs(arm) < 20)
-        arm = 0;
-      if (arm < -127)
-        arm = -127;
-      motorReq[rightlift] = arm;
-      motorReq[leftlift] = arm;
-    }
-    wait1Msec(MOTOR_TASK_DELAY);
-  }
+	while (true) {
+		if(lifthold)
+		{
+			int currentvalue = SensorValue[liftSensor];
+			armerror = armtarget - abs(currentvalue);
+			arm = armerror / 5;
+			if (arm > 127) {
+				arm = 127;
+			}
+			if (abs(arm) < 20)
+				arm = 0;
+			if (arm < -127)
+				arm = -127;
+			motorReq[rightlift] = arm;
+			motorReq[leftlift] = arm;
+		}
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
 }
 void autoleft();
 void autoskill();
@@ -122,435 +123,435 @@ void autoright();
 void auto();
 void moveforward_right(int forward) {
 
-  motorReq[rightfrontwheel] = -forward;
-  motorReq[rightbackwheel] = -forward;
+	motorReq[rightfrontwheel] = -forward;
+	motorReq[rightbackwheel] = -forward;
 }
 void moveforward_left(int forward) {
-  motorReq[leftfrontwheel] = forward;
-  motorReq[leftbackwheel] = forward;
+	motorReq[leftfrontwheel] = forward;
+	motorReq[leftbackwheel] = forward;
 }
 void moveforward(int forward) {
-  moveforward_left(forward);
-  moveforward_right(forward);
+	moveforward_left(forward);
+	moveforward_right(forward);
 }
 void movebackward_left(int backward) {
-  motorReq[leftfrontwheel] = -backward;
-  motorReq[leftbackwheel] = -backward;
+	motorReq[leftfrontwheel] = -backward;
+	motorReq[leftbackwheel] = -backward;
 }
 void movebackward_right(int backward) {
-  motorReq[rightfrontwheel] = backward;
-  motorReq[rightbackwheel] = backward;
+	motorReq[rightfrontwheel] = backward;
+	motorReq[rightbackwheel] = backward;
 }
 void movebackward(int backward) {
-  movebackward_right(backward);
-  movebackward_left(backward);
+	movebackward_right(backward);
+	movebackward_left(backward);
 }
 void turnleft_left(int left) {
-  motorReq[leftfrontwheel] = -left;
-  motorReq[leftbackwheel] = -left;
+	motorReq[leftfrontwheel] = -left;
+	motorReq[leftbackwheel] = -left;
 }
 void turnleft_right(int left) {
-  motorReq[rightfrontwheel] = -left;
-  motorReq[rightbackwheel] = -left;
+	motorReq[rightfrontwheel] = -left;
+	motorReq[rightbackwheel] = -left;
 }
 void turnleft(int left) {
-  turnleft_right(left);
-  turnleft_left(left);
+	turnleft_right(left);
+	turnleft_left(left);
 }
 void turnright_left(int right) {
-  motorReq[leftfrontwheel] = right;
-  motorReq[leftbackwheel] = right;
+	motorReq[leftfrontwheel] = right;
+	motorReq[leftbackwheel] = right;
 }
 void turnright_right(int right) {
-  motorReq[rightfrontwheel] = right;
-  motorReq[rightbackwheel] = right;
+	motorReq[rightfrontwheel] = right;
+	motorReq[rightbackwheel] = right;
 }
 void turnright(int right) {
-  turnright_right(right);
-  turnright_left(right);
+	turnright_right(right);
+	turnright_left(right);
 }
 void closeclaw() { clawtarget = CLAW_CLOSE; }
 void openclaw() { clawtarget = CLAW_OPEN; }
 void liftarm() { armtarget = ARM_HIGH; }
 void droparm() { armtarget = ARM_LOW; }
 void setArmPower(int speed) {
-  // motorReq[leftclaw] = speed;
-  motorReq[claw] = speed;
+	// motorReq[leftclaw] = speed;
+	motorReq[claw] = speed;
 }
 
 void moveForwardWithSensor(int rotations) {
-  SensorValue[leftshaft] = 0;
-  SensorValue[rightshaft] = 0;
-  int min_leftpower = 25;
-  int min_rightpower = 25;
-  int lastSensorValueRight = 0;
-  int lastSensorValueLeft = 0;
+	SensorValue[leftshaft] = 0;
+	SensorValue[rightshaft] = 0;
+	int min_leftpower = 25;
+	int min_rightpower = 25;
+	int lastSensorValueRight = 0;
+	int lastSensorValueLeft = 0;
 
-  while ((SensorValue[leftshaft] < rotations) ||
-         (SensorValue[rightshaft] < rotations)) {
-    int leftpower = 0;
-    int rightpower = 0;
-    if (SensorValue[leftshaft] < rotations) {
+	while ((SensorValue[leftshaft] < rotations) ||
+		(SensorValue[rightshaft] < rotations)) {
+		int leftpower = 0;
+		int rightpower = 0;
+		if (SensorValue[leftshaft] < rotations) {
 
-      int error = rotations - SensorValue[leftshaft];
+			int error = rotations - SensorValue[leftshaft];
 
-      leftpower = error / 2;
-      if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
-        min_leftpower += 5;
-      if (leftpower < min_leftpower)
-        leftpower = min_leftpower;
-      leftpower = min(127, leftpower)
-    }
-    if (SensorValue[rightshaft] < rotations) {
+			leftpower = error / 2;
+			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+				min_leftpower += 5;
+			if (leftpower < min_leftpower)
+				leftpower = min_leftpower;
+			leftpower = min(127, leftpower)
+		}
+		if (SensorValue[rightshaft] < rotations) {
 
-      int error = rotations - SensorValue[rightshaft];
+			int error = rotations - SensorValue[rightshaft];
 
-      rightpower = error / 2;
-      if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
-        min_rightpower += 5;
-      if (rightpower < min_rightpower)
-        rightpower = min_rightpower;
-      rightpower = min(127, rightpower)
-    }
+			rightpower = error / 2;
+			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+				min_rightpower += 5;
+			if (rightpower < min_rightpower)
+				rightpower = min_rightpower;
+			rightpower = min(127, rightpower)
+		}
 
-    moveforward_left(leftpower);
-    moveforward_right(rightpower);
-    lastSensorValueLeft = abs(SensorValue[leftshaft]);
-    lastSensorValueRight = abs(SensorValue[rightshaft]);
-    wait1Msec(MOTOR_TASK_DELAY);
-  }
-  moveforward(0);
+		moveforward_left(leftpower);
+		moveforward_right(rightpower);
+		lastSensorValueLeft = abs(SensorValue[leftshaft]);
+		lastSensorValueRight = abs(SensorValue[rightshaft]);
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
+	moveforward(0);
 }
 void turnRightWithSensor(int rotations) {
-  SensorValue[leftshaft] = 0;
-  SensorValue[rightshaft] = 0;
-  int min_rightpower = 25;
-  int min_leftpower = 25;
-  int lastSensorValueRight = 0;
-  int lastSensorValueLeft = 0;
+	SensorValue[leftshaft] = 0;
+	SensorValue[rightshaft] = 0;
+	int min_rightpower = 25;
+	int min_leftpower = 25;
+	int lastSensorValueRight = 0;
+	int lastSensorValueLeft = 0;
 
-  while ((abs(SensorValue[leftshaft]) < rotations) ||
-    (abs(SensorValue[rightshaft]) < rotations)) {
-    int leftpower = 0;
-    int rightpower = 0;
-    if (abs(SensorValue[leftshaft]) < rotations) {
+	while ((abs(SensorValue[leftshaft]) < rotations) ||
+		(abs(SensorValue[rightshaft]) < rotations)) {
+		int leftpower = 0;
+		int rightpower = 0;
+		if (abs(SensorValue[leftshaft]) < rotations) {
 
-      int error = rotations - abs(SensorValue[leftshaft]);
+			int error = rotations - abs(SensorValue[leftshaft]);
 
-      leftpower = error / 2;
-      if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
-        min_leftpower += 5;
-      if (leftpower < min_leftpower)
-        leftpower = min_leftpower;
-      leftpower = min(127, leftpower)
-    }
-    if (abs(SensorValue[rightshaft]) < rotations) {
+			leftpower = error / 2;
+			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+				min_leftpower += 5;
+			if (leftpower < min_leftpower)
+				leftpower = min_leftpower;
+			leftpower = min(127, leftpower)
+		}
+		if (abs(SensorValue[rightshaft]) < rotations) {
 
-      int error = rotations - abs(SensorValue[rightshaft]);
+			int error = rotations - abs(SensorValue[rightshaft]);
 
-      rightpower = error / 2;
-      if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
-        min_rightpower += 5;
-      if (rightpower < min_rightpower)
-        rightpower = min_rightpower;
-      rightpower = min(127, rightpower)
-    }
-    turnright_left(leftpower);
-    turnright_right(rightpower);
-    lastSensorValueLeft = abs(SensorValue[leftshaft]);
-    lastSensorValueRight = abs(SensorValue[rightshaft]);
-    wait1Msec(MOTOR_TASK_DELAY);
-  }
-  turnright(0);
+			rightpower = error / 2;
+			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+				min_rightpower += 5;
+			if (rightpower < min_rightpower)
+				rightpower = min_rightpower;
+			rightpower = min(127, rightpower)
+		}
+		turnright_left(leftpower);
+		turnright_right(rightpower);
+		lastSensorValueLeft = abs(SensorValue[leftshaft]);
+		lastSensorValueRight = abs(SensorValue[rightshaft]);
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
+	turnright(0);
 }
 void waitforarmheight(int height)
 {
-  while (SensorValue[liftSensor] < height)
-    wait1Msec(MOTOR_TASK_DELAY);
+	while (SensorValue[liftSensor] < height)
+		wait1Msec(MOTOR_TASK_DELAY);
 }
 
 void moveBackwardWithSensor(int rotations) {
-  SensorValue[leftshaft] = 0;
-  SensorValue[rightshaft] = 0;
-  int min_leftpower = 25;
-  int min_rightpower = 25;
-  int lastSensorValueLeft = 0;
-  int lastSensorValueRight = 0;
-  while ((abs(SensorValue[leftshaft]) < rotations) ||
-         (abs(SensorValue[rightshaft]) < rotations)) {
-    int leftpower = 0;
-    int rightpower = 0;
-    if (abs(SensorValue[leftshaft]) < rotations) {
+	SensorValue[leftshaft] = 0;
+	SensorValue[rightshaft] = 0;
+	int min_leftpower = 25;
+	int min_rightpower = 25;
+	int lastSensorValueLeft = 0;
+	int lastSensorValueRight = 0;
+	while ((abs(SensorValue[leftshaft]) < rotations) ||
+		(abs(SensorValue[rightshaft]) < rotations)) {
+		int leftpower = 0;
+		int rightpower = 0;
+		if (abs(SensorValue[leftshaft]) < rotations) {
 
-      int error = rotations - abs(SensorValue[leftshaft]);
+			int error = rotations - abs(SensorValue[leftshaft]);
 
-      leftpower = error / 2;
-      if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
-        min_leftpower += 5;
-      if (leftpower < min_leftpower)
-        leftpower = min_leftpower;
-      leftpower = min(127, leftpower)
-    }
-    if (abs(SensorValue[rightshaft]) < rotations) {
+			leftpower = error / 2;
+			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+				min_leftpower += 5;
+			if (leftpower < min_leftpower)
+				leftpower = min_leftpower;
+			leftpower = min(127, leftpower)
+		}
+		if (abs(SensorValue[rightshaft]) < rotations) {
 
-      int error = rotations - abs(SensorValue[rightshaft]);
+			int error = rotations - abs(SensorValue[rightshaft]);
 
-      rightpower = error / 2;
-      if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
-        min_rightpower += 5;
-      if (rightpower < min_rightpower)
-        rightpower = min_rightpower;
-      rightpower = min(127, rightpower)
-    }
-    movebackward_left(leftpower);
-    movebackward_right(rightpower);
-    lastSensorValueLeft = abs(SensorValue[leftshaft]);
-    lastSensorValueRight = abs(SensorValue[rightshaft]);
-    wait1Msec(MOTOR_TASK_DELAY);
-  }
-  movebackward(0);
+			rightpower = error / 2;
+			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+				min_rightpower += 5;
+			if (rightpower < min_rightpower)
+				rightpower = min_rightpower;
+			rightpower = min(127, rightpower)
+		}
+		movebackward_left(leftpower);
+		movebackward_right(rightpower);
+		lastSensorValueLeft = abs(SensorValue[leftshaft]);
+		lastSensorValueRight = abs(SensorValue[rightshaft]);
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
+	movebackward(0);
 }
 void turnLeftWithSensor(int rotations) {
-  SensorValue[leftshaft] = 0;
-  SensorValue[rightshaft] = 0;
-  int min_leftpower = 25;
-  int min_rightpower = 25;
-  int lastSensorValueLeft = 0;
-  int lastSensorValueRight = 0;
-  while ((abs(SensorValue[leftshaft]) < rotations) ||
-         (abs(SensorValue[rightshaft]) < rotations)) {
-    int leftpower = 0;
-    int rightpower = 0;
-    if (abs(SensorValue[leftshaft]) < rotations) {
+	SensorValue[leftshaft] = 0;
+	SensorValue[rightshaft] = 0;
+	int min_leftpower = 25;
+	int min_rightpower = 25;
+	int lastSensorValueLeft = 0;
+	int lastSensorValueRight = 0;
+	while ((abs(SensorValue[leftshaft]) < rotations) ||
+		(abs(SensorValue[rightshaft]) < rotations)) {
+		int leftpower = 0;
+		int rightpower = 0;
+		if (abs(SensorValue[leftshaft]) < rotations) {
 
-      int error = rotations - abs(SensorValue[leftshaft]);
+			int error = rotations - abs(SensorValue[leftshaft]);
 
-      leftpower = error / 2;
-      if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
-        min_leftpower += 5;
-      if (leftpower < min_leftpower)
-        leftpower = min_leftpower;
-      leftpower = min(127, leftpower)
-    }
-    if (abs(SensorValue[rightshaft]) < rotations) {
+			leftpower = error / 2;
+			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+				min_leftpower += 5;
+			if (leftpower < min_leftpower)
+				leftpower = min_leftpower;
+			leftpower = min(127, leftpower)
+		}
+		if (abs(SensorValue[rightshaft]) < rotations) {
 
-      int error = rotations - abs(SensorValue[rightshaft]);
+			int error = rotations - abs(SensorValue[rightshaft]);
 
-      rightpower = error / 2;
-      if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
-        min_rightpower += 5;
-      if (rightpower < min_rightpower)
-        rightpower = min_rightpower;
-      rightpower = min(127, rightpower)
-    }
-    turnleft_left(leftpower);
-    turnleft_right(rightpower);
-    lastSensorValueLeft = abs(SensorValue[leftshaft]);
-    lastSensorValueRight = abs(SensorValue[rightshaft]);
-    wait1Msec(MOTOR_TASK_DELAY);
-  }
-  turnleft(0);
+			rightpower = error / 2;
+			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+				min_rightpower += 5;
+			if (rightpower < min_rightpower)
+				rightpower = min_rightpower;
+			rightpower = min(127, rightpower)
+		}
+		turnleft_left(leftpower);
+		turnleft_right(rightpower);
+		lastSensorValueLeft = abs(SensorValue[leftshaft]);
+		lastSensorValueRight = abs(SensorValue[rightshaft]);
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
+	turnleft(0);
 }
 task autonomous() {
-  startTask(MotorSlewRateTask);
-  startTask(arm_Control);
-  startTask(claw_Control);
+	startTask(MotorSlewRateTask);
+	startTask(arm_Control);
+	startTask(claw_Control);
 
-  auto();
+	auto();
 
-  stopTask(MotorSlewRateTask);
-  stopTask(arm_Control);
-  stopTask(claw_Control);
+	stopTask(MotorSlewRateTask);
+	stopTask(arm_Control);
+	stopTask(claw_Control);
 }
 void auto() {
-  droparm();
-  clawhold = true;
-  lifthold = true;
-  if (SensorValue[skill] == 1) {
-    autoskill();
-  } else if (SensorValue[rightauto] == 1) {
-    autoright();
-  } else {
-    autoleft();
-  }
+	droparm();
+	clawhold = true;
+	lifthold = true;
+	if (SensorValue[skill] == 1) {
+		autoskill();
+		} else if (SensorValue[rightauto] == 1) {
+		autoright();
+		} else {
+		autoleft();
+	}
 }
 void autoleft() {
 
-  moveForwardWithSensor(640);
-  turnRightWithSensor(260);
-  moveForwardWithSensor(450);
-  closeclaw();
-  wait1Msec(500);
-  liftarm();
-  waitforarmheight(2500);
-  turnLeftWithSensor(200);
-  moveForwardWithSensor(750);
-  openclaw();
-  moveBackwardWithSensor(300);
-  turnLeftWithSensor(480);
+	moveForwardWithSensor(640);
+	turnRightWithSensor(260);
+	moveForwardWithSensor(450);
+	closeclaw();
+	wait1Msec(500);
+	liftarm();
+	waitforarmheight(2500);
+	turnLeftWithSensor(200);
+	moveForwardWithSensor(750);
+	openclaw();
+	moveBackwardWithSensor(300);
+	turnLeftWithSensor(480);
 
 }
 
 void autoskill() {
 
-  openclaw();
-  liftarm();
-  // goes forward while lifting arm and closing
-  turnleft(127);
-  wait1Msec(90);
-  turnleft(0);
-// move forward to hit stars off wall
-  moveForwardWithSensor(1500);
-  //
+	openclaw();
+	liftarm();
+	// goes forward while lifting arm and closing
+	turnleft(127);
+	wait1Msec(90);
+	turnleft(0);
+	// move forward to hit stars off wall
+	moveForwardWithSensor(1500);
+	//
 
-  moveBackwardWithSensor(200);
-// turns to get stars infront of middle fence
-  turnRightWithSensor(290);
-  clawtarget = 2300;
-  wait1Msec(500);
+	moveBackwardWithSensor(200);
+	// turns to get stars infront of middle fence
+	turnRightWithSensor(290);
+	clawtarget = 2300;
+	wait1Msec(500);
 
-  droparm();
-  wait1Msec(1000);
-  // moves forward and grabs the 3 stars infront of the middle fence
-  moveForwardWithSensor(1160);
-  closeclaw();
-  liftarm();
-  waitforarmheight(2500);
-  movebackwardWithSensor(150);
-  // drop the 3 stars on the other side
-  turnLeftWithSensor(200);
-  moveForwardWithSensor(150);
-  openclaw();
-  wait1Msec(500);
-  // turn  to grab cube
-  turnRightWithSensor(449);
-  droparm();
-  wait1Msec(700);
-  // move forward and grab cube
-  moveForwardWithSensor(150);
-  closeclaw();
+	droparm();
+	wait1Msec(1000);
+	// moves forward and grabs the 3 stars infront of the middle fence
+	moveForwardWithSensor(1160);
+	closeclaw();
+	liftarm();
+	waitforarmheight(2500);
+	movebackwardWithSensor(150);
+	// drop the 3 stars on the other side
+	turnLeftWithSensor(200);
+	moveForwardWithSensor(150);
+	openclaw();
+	wait1Msec(500);
+	// turn  to grab cube
+	turnRightWithSensor(449);
+	droparm();
+	wait1Msec(700);
+	// move forward and grab cube
+	moveForwardWithSensor(150);
+	closeclaw();
 
-  wait1Msec(500);
-  liftarm();
-  wait1Msec(1000);
-  // drops cube on the other side
-  turnLeftWithSensor(500);
-  moveForwardWithSensor(400);
-  openclaw();
-  wait1Msec(500);
-  // turns around
-  turnLeftWithSensor(425);
-  moveForwardWithSensor(1000);
-  // grabs first cube
-  wait1Msec(1000);
-  closeclaw();
-  wait1Msec(500);
-  //drops first cube
-  turnRightWithSensor(475);
-  moveForwardWithSensor(1250);
-  openclaw();
-  wait1Msec(1000);
-  //turns around and moves forward
-   turnLeftWithSensor(440);
-  moveForwardWithSensor(1000);
-  wait1Msec(1000);
-  // grabs secound cube
-  closeclaw();
-  wait1Msec(500);
-  // goes forward with second cube
-  turnRightWithSensor(500);
-  moveForwardWithSensor(1250);
-  openclaw();
-  wait1Msec(1000);
-     turnLeftWithSensor(460);
-  moveForwardWithSensor(1000);
-  wait1Msec(1000);
-  closeclaw();
-  wait1Msec(500);
-  turnRightWithSensor(475)
-  moveForwardWithSensor(1250);
-  openclaw();
-  /*  moveforward(127);
-  wait1Msec(1700);
- moveforward(0);
-  closeclaw();
-  wait1Msec(250);
-  liftarm();
-  wait1Msec(1000);
-  turnleft(127);
-  wait1Msec(600);
-  moveforward(127);
-  wait1Msec(550);
-  openclaw();
-  wait1Msec(500);
-  movebackward(127);
-  wait1Msec(450);
-  turnright(127);
-  wait1Msec(1150);
-  turnright(0);
-  droparm();
-  wait1Msec(1000);
-  moveforward(127);
-  wait1Msec(400);
-  moveforward(0);
-  closeclaw();
-  wait1Msec(500);
-  liftarm();
-  wait1Msec(1000);
-  turnleft(127);
-  wait1Msec(1000);
-  moveforward(127);
-  wait1Msec(900);
-  moveforward(0);
-  openclaw();
-  wait1Msec(500);
-  movebackward(127);
-  wait1Msec(900);
-  turnright(127);
-  wait1Msec(600);
-  droparm();
-  moveforward(127);
-  clawtarget = 2400;
-  wait1Msec(1600);
-  moveforward(0);
-  closeclaw();
-  wait1Msec(500);
-  liftarm();
-  wait1Msec(1000);
-  turnleft(127);
-  wait1Msec(1400);
-  moveforward(127);
-wait1Msec(1500);
-*/ // moveforward(0);
+	wait1Msec(500);
+	liftarm();
+	wait1Msec(1000);
+	// drops cube on the other side
+	turnLeftWithSensor(500);
+	moveForwardWithSensor(400);
+	openclaw();
+	wait1Msec(500);
+	// turns around
+	turnLeftWithSensor(425);
+	moveForwardWithSensor(1000);
+	// grabs first cube
+	wait1Msec(1000);
+	closeclaw();
+	wait1Msec(500);
+	//drops first cube
+	turnRightWithSensor(475);
+	moveForwardWithSensor(1250);
+	openclaw();
+	wait1Msec(1000);
+	//turns around and moves forward
+	turnLeftWithSensor(440);
+	moveForwardWithSensor(1000);
+	wait1Msec(1000);
+	// grabs secound cube
+	closeclaw();
+	wait1Msec(500);
+	// goes forward with second cube
+	turnRightWithSensor(500);
+	moveForwardWithSensor(1250);
+	openclaw();
+	wait1Msec(1000);
+	turnLeftWithSensor(460);
+	moveForwardWithSensor(1000);
+	wait1Msec(1000);
+	closeclaw();
+	wait1Msec(500);
+	turnRightWithSensor(475)
+	moveForwardWithSensor(1250);
+	openclaw();
+	/*  moveforward(127);
+	wait1Msec(1700);
+	moveforward(0);
+	closeclaw();
+	wait1Msec(250);
+	liftarm();
+	wait1Msec(1000);
+	turnleft(127);
+	wait1Msec(600);
+	moveforward(127);
+	wait1Msec(550);
+	openclaw();
+	wait1Msec(500);
+	movebackward(127);
+	wait1Msec(450);
+	turnright(127);
+	wait1Msec(1150);
+	turnright(0);
+	droparm();
+	wait1Msec(1000);
+	moveforward(127);
+	wait1Msec(400);
+	moveforward(0);
+	closeclaw();
+	wait1Msec(500);
+	liftarm();
+	wait1Msec(1000);
+	turnleft(127);
+	wait1Msec(1000);
+	moveforward(127);
+	wait1Msec(900);
+	moveforward(0);
+	openclaw();
+	wait1Msec(500);
+	movebackward(127);
+	wait1Msec(900);
+	turnright(127);
+	wait1Msec(600);
+	droparm();
+	moveforward(127);
+	clawtarget = 2400;
+	wait1Msec(1600);
+	moveforward(0);
+	closeclaw();
+	wait1Msec(500);
+	liftarm();
+	wait1Msec(1000);
+	turnleft(127);
+	wait1Msec(1400);
+	moveforward(127);
+	wait1Msec(1500);
+	*/ // moveforward(0);
 
-  // 2400
+	// 2400
 }
 void autoright() {
-  clawtarget = 2300;
+	clawtarget = 2300;
 
 
-  moveForwardWithSensor(600);
+	moveForwardWithSensor(600);
 
-  wait1Msec(500);
-  turnLeftWithSensor(200)
-  moveForwardWithSensor(400);
-   closeclaw();
-   wait1Msec(500);
-  liftarm();
-  waitforarmheight(2500);
-  turnRightWithSensor(130);
-  moveForwardWithSensor(850);
-  clawtarget = 2300;
-  wait1Msec(1000);
- moveBackwardWithSensor(600);
- armtarget = 2400;
- openclaw();
- //turnWithSensor(60);
- wait1Msec(500);
- moveForwardWithSensor(650);
- wait1Msec(300);
- moveBackwardWithSensor(650);
- droparm();
+	wait1Msec(500);
+	turnLeftWithSensor(200)
+	moveForwardWithSensor(400);
+	closeclaw();
+	wait1Msec(500);
+	liftarm();
+	waitforarmheight(2500);
+	turnRightWithSensor(130);
+	moveForwardWithSensor(850);
+	clawtarget = 2300;
+	wait1Msec(1000);
+	moveBackwardWithSensor(600);
+	armtarget = 2400;
+	openclaw();
+	//turnWithSensor(60);
+	wait1Msec(500);
+	moveForwardWithSensor(650);
+	wait1Msec(300);
+	moveBackwardWithSensor(650);
+	droparm();
 
 
 
@@ -570,138 +571,168 @@ void autoright() {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 task usercontrol() {
-  // User control code here, inside the loop
-  startTask(arm_Control);
-  startTask(claw_Control);
-  startTask(MotorSlewRateTask);
-  int clawOpenSpeed = 127;
-  int clawCloseSpeed = 127;
-  int clawGrabSpeed = 100;
-  bool clawGrab = false;
-  lifthold = false;
-  SensorValue[leftshaft] = 0;
-  SensorValue[skill] = 0;
-  SensorValue[rightauto] = 0;
-  int clawspeed = 0;
-  int arm = 0;
-  int armerror = 0;
-  armtarget = 40;
-  while (true) {
-    int clawSensorValue = SensorValue[clawSensor];
-    int liftSensorValue = SensorValue[liftSensor];
-    int backwheelspeed = 0;
-    int leftBspeed = 0;
-    int leftFspeed = 0;
-    int rightFspeed = 0;
-    int rightBspeed = 0;
-    if (vexRT[Btn5U] == 1) {
-      auto();
-    }
+	// User control code here, inside the loop
+	startTask(arm_Control);
+	startTask(claw_Control);
+	startTask(MotorSlewRateTask);
+	int clawOpenSpeed = 127;
+	int clawCloseSpeed = 127;
+	int clawGrabSpeed = 100;
+	bool stallhang = false;
+	lifthold = false;
+	SensorValue[leftshaft] = 0;
+	SensorValue[skill] = 0;
+	SensorValue[rightauto] = 0;
+	int clawspeed = 0;
+	int arm = 0;
+	int armerror = 0;
+	armtarget = 40;
+	while (true) {
+		int clawSensorValue = SensorValue[clawSensor];
+		int liftSensorValue = SensorValue[liftSensor];
+		int backwheelspeed = 0;
+		int leftBspeed = 0;
+		int leftFspeed = 0;
+		int rightFspeed = 0;
+		int rightBspeed = 0;
+		if (vexRT[Btn5U] == 1) {
+			auto();
+		}
 
-    // Turn left-right
-    if (abs(vexRT[Ch4]) > DEADBAND) {
-      leftBspeed = vexRT[Ch4] / 2;
-      leftFspeed = vexRT[Ch4] / 2;
-      rightBspeed = vexRT[Ch4] / 2;
-      rightFspeed = vexRT[Ch4] / 2;
-    } else {
-      // Move Forward/Backward
-      if (abs(vexRT[Ch2]) > DEADBAND) {
-        leftFspeed = vexRT[Ch2];
-        leftBspeed = vexRT[Ch2];
-        rightFspeed = -vexRT[Ch2];
-        rightBspeed = -vexRT[Ch2];
-      }
+		// Turn left-right
+		if (abs(vexRT[Ch4]) > DEADBAND) {
+			leftBspeed = vexRT[Ch4] / 2;
+			leftFspeed = vexRT[Ch4] / 2;
+			rightBspeed = vexRT[Ch4] / 2;
+			rightFspeed = vexRT[Ch4] / 2;
+			} else {
+			// Move Forward/Backward
+			if (abs(vexRT[Ch2]) > DEADBAND) {
+				leftFspeed = vexRT[Ch2];
+				leftBspeed = vexRT[Ch2];
+				rightFspeed = -vexRT[Ch2];
+				rightBspeed = -vexRT[Ch2];
+			}
 
-      // Move Right/Left
-      if (abs(vexRT[Ch1]) > DEADBAND) {
-        backwheelspeed = -vexRT[Ch1];
-      }
-    }
-     if(vexRT[btn8U] == 1)
-     {
-    SensorValue[leftshaft] = 0;
-    SensorValue[rightshaft] = 0;
-   }
-    // Close Claw
-    if (vexRT[Btn8UXmtr2] == 1) {
-      clawtarget = min(2950, clawtarget + 25);
-      clawhold = false;
-    }
-    // Open Claw
-    else if (vexRT[Btn8DXmtr2] == 1) {
-      clawtarget = max(1200, clawtarget - 25);
-      clawhold = false;
 
-    } else {
-      // Grab and Hold
-      if (vexRT[Btn6UXmtr2] == 1) {
-        clawtarget = 2940;
-        clawhold = true;
-      }
-      if (!clawhold) {
-        clawspeed = 0;
-      }
-    }
+		}
+		if(vexRT[Btn6U] == 1)
+		{
+			stallhang = true;
+		}
+		else if(vexRT[Btn6D] == 1)
+		{
+			stallhang = false;
+		}
 
-    // Lift
-    if (vexRT[Btn5UXmtr2] == 1) {
-      lifthold = true;
-      armtarget = 1500;
-    }
+		if(vexRT[Btn7U] == 1)
+		{
+			motorReq[hang] = 127;
 
-    if (vexRT[Btn7UXmtr2] == 1) {
-      // Srop Arm when switch activated
-      armtarget = min(ARM_HIGH, armtarget + 30);
-      lifthold = true;
-    }
+			if(SensorValue[hangtoplimit] == 1)
+			{
+				motorReq[hang] = 0;
+			}
+		} else if(vexRT[Btn7D] == 1)
+		{
+			motorReq[hang] = -127;
 
-    // Drop Lift
-    else if (vexRT[Btn7DXmtr2] == 1) {
-      armtarget = max(ARM_LOW, armtarget - 25);
-      lifthold = true;
-    }
+		} else
+		{
+			if(stallhang)
+			{
+				motorReq[hang] = 30;
+			} else
+			{
+				motorReq[hang] = 0;
+			}
+		}
 
-    else {
-      arm = 0;
-    }
+		if(vexRT[Btn8U] == 1)
+		{
+			SensorValue[leftshaft] = 0;
+			SensorValue[rightshaft] = 0;
+		}
+		// Close Claw
+		if (vexRT[Btn8UXmtr2] == 1) {
+			clawtarget = min(2950, clawtarget + 25);
+			clawhold = false;
+		}
+		// Open Claw
+		else if (vexRT[Btn8DXmtr2] == 1) {
+			clawtarget = max(1200, clawtarget - 25);
+			clawhold = false;
 
-    if (vexRT[Btn5DXmtr2] == 1) {
-      arm = 0;
-      lifthold = false;
-    }
+			} else {
+			// Grab and Hold
+			if (vexRT[Btn6UXmtr2] == 1) {
+				clawtarget = 2940;
+				clawhold = true;
+			}
+			if (!clawhold) {
+				clawspeed = 0;
+			}
+		}
 
-    // keeps lift up a little to move around
-    /*
-    if (SensorValue[touch] == 1) {
-      if (arm > 0) {
-        arm = 0;
-      }
-      claw = clawOpenSpeed;
-      clawhold = false;
-      lifthold = false;
-    }
-    if (SensorValue[bumper] == 1) {
-      if (arm < 0) {
-        arm = 0;
-      }
-      SensorValue[leftshaft] = 0;
-    }
-    */
-    motorReq[backwheel] =
-        backwheelspeed; // arm Sensor max value 2700(top) min value 900(bottom)
-    motorReq[leftbackwheel] = leftBspeed; // claw closed 2870 claw middle 1250
-    motorReq[leftfrontwheel] = leftFspeed;
-    motorReq[rightfrontwheel] = rightFspeed;
-    motorReq[rightbackwheel] = rightBspeed;
+		// Lift
+		if (vexRT[Btn5UXmtr2] == 1) {
+			lifthold = true;
+			armtarget = 1500;
+		}
 
-    if (!clawhold)
-      motorReq[claw] = clawspeed;
-    if (!lifthold) {
-      motorReq[rightlift] = arm;
-      motorReq[leftlift] = arm;
-    }
-    wait1Msec(MOTOR_TASK_DELAY);
-  }
+		if (vexRT[Btn7UXmtr2] == 1) {
+			// Srop Arm when switch activated
+			armtarget = min(ARM_HIGH, armtarget + 30);
+			lifthold = true;
+		}
+
+		// Drop Lift
+		else if (vexRT[Btn7DXmtr2] == 1) {
+			armtarget = max(ARM_LOW, armtarget - 25);
+			lifthold = true;
+		}
+
+		else {
+			arm = 0;
+		}
+
+		if (vexRT[Btn5DXmtr2] == 1) {
+			arm = 0;
+			lifthold = false;
+		}
+
+		// keeps lift up a little to move around
+		/*
+		if (SensorValue[touch] == 1) {
+		if (arm > 0) {
+		arm = 0;
+		}
+		claw = clawOpenSpeed;
+		clawhold = false;
+		lifthold = false;
+		}
+		if (SensorValue[bumper] == 1) {
+		if (arm < 0) {
+		arm = 0;
+		}
+		SensorValue[leftshaft] = 0;
+		}
+		*/
+
+		// arm Sensor max value 2700(top) min value 900(bottom)
+		motorReq[leftbackwheel] = leftBspeed; // claw closed 2870 claw middle 1250
+		motorReq[leftfrontwheel] = leftFspeed;
+		motorReq[rightfrontwheel] = rightFspeed;
+		motorReq[rightbackwheel] = rightBspeed;
+		// motorReq[bottomhang] = hang;
+		// motorReq[tophang] = hang;
+
+		if (!clawhold)
+			motorReq[claw] = clawspeed;
+		if (!lifthold) {
+			motorReq[rightlift] = arm;
+			motorReq[leftlift] = arm;
+		}
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
 }
-// motor max power ;-
