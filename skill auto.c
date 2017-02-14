@@ -1,19 +1,76 @@
 void autoskill() {
 
-	openclaw();
+	clawtarget = 2625;
 	liftarm();
+	waitforarmheight(ARM_HIGH-150);
 	// goes forward while lifting arm and closing
-	turnleft(127);
-	wait1Msec(90);
-	turnleft(0);
+	//turnleft(127);
+	wait1Msec(1000);
+	closeclaw();
+	wait1Msec(500);
+	//turnleft(0);
 	// move forward to hit stars off wall
-	moveForwardWithSensor(1500);
-	//
+	moveForwardWithSensor(1350);
+	clawtarget = 2000;
+	wait1Msec(750);
+	openclaw();
+	moveBackwardWithSensor(1200);
+	clawtarget = 2625;
+	wait1Msec(1000);
+	moveForwardWithSensor(1350);
+	openclaw();
+
+
+	moveBackwardWithSensor(1200);
+	wait1Msec(1000);
+	closeclaw();
+	wait1Msec(500);
+	moveForwardWithSensor(1350);
+	openclaw();
+	wait1Msec(500);
+	openclaw();
+
+	moveBackwardWithSensor(1200);
+	wait1Msec(1000);
+	closeclaw();
+	wait1Msec(500);
+	moveForwardWithSensor(1350);
+	openclaw();
+	/*
+	moveForwardWithSensor(100);
+	moveBackwardWithSensor(70);
+	clawtarget = 2300;
+
+	turnRightWithSensor(300);
+
+	droparm();
+	wait1Msec(1000);
+	moveForwardWithSensor(900);
+	turnRightWithSensor(50);
+	closeclaw();
+	liftarm();
+	wait1Msec(1000);
+	turnLeftWithSensor(200);
+	moveForwardWithSensor(150);
+	openclaw();
+ wait1Msec(750);
+ moveBackwardWithSensor(500);
+turnRightWithSensor(450);
+droparm();
+
+
+
+
+
+
+
+
+	/*////2600
 
 	moveBackwardWithSensor(200);
 	// turns to get stars infront of middle fence
-	turnRightWithSensor(290);
-	clawtarget = 2300;
+	turnRightWithSensor(280);
+	/*clawtarget = 2300;
 	wait1Msec(500);
 
 	droparm();
@@ -45,7 +102,7 @@ void autoskill() {
 	moveForwardWithSensor(400);
 	openclaw();
 	wait1Msec(500);
-	// turns around
+/*	// turns around
 	turnLeftWithSensor(425);
 	moveForwardWithSensor(1000);
 	// grabs first cube
@@ -77,7 +134,7 @@ void autoskill() {
 	turnRightWithSensor(475)
 	moveForwardWithSensor(1250);
 	openclaw();
-	/*  moveforward(127);
+*/	/*  moveforward(127);
 	wait1Msec(1700);
 	moveforward(0);
 	closeclaw();

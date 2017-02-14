@@ -1,5 +1,5 @@
 void autoleft() {
-
+  clawtarget = 2300;
 	moveForwardWithSensor(640);
 	turnRightWithSensor(260);
 	moveForwardWithSensor(450);
