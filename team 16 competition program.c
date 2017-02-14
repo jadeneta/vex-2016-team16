@@ -36,6 +36,7 @@ const int CLAW_CLOSE = 2780;
 const int ClAW_OPEN = 1200;
 const int ARM_HIGH = 2650;
 const int TURNRIGHT_90 = 311;
+const float SLEW_OFFSET = .4;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -205,15 +206,18 @@ void moveForwardWithSensor(int rotations) {
 	int rightmultiplier = 1;
 	int buffer = 10;
 	float slowdown = .98;
-	while ((SensorValue[leftshaft] < rotations) ||
-		(SensorValue[rightshaft] < rotations)) {
+
+
+
+	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/2 < rotations * SLEW_OFFSET)	 {
 		int leftpower = 0;
 		int rightpower = 0;
+
 		if (SensorValue[leftshaft] < rotations) {
 
 			int error = rotations - SensorValue[leftshaft];
 
-			leftpower = error / 2;
+			leftpower = error / 4;
 			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
@@ -224,7 +228,7 @@ void moveForwardWithSensor(int rotations) {
 
 			int error = rotations - SensorValue[rightshaft];
 
-			rightpower = error / 2;
+			rightpower = error / 4;
 			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
@@ -269,15 +273,14 @@ void turnRightWithSensor(int rotations) {
 	int rightmultiplier = 1;
 	float slowdown = .98;
 	int buffer = 10;
-	while ((abs(SensorValue[leftshaft]) < rotations) ||
-		(abs(SensorValue[rightshaft]) < rotations)) {
+	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/2 < rotations * SLEW_OFFSET) {
 		int leftpower = 0;
 		int rightpower = 0;
 		if (abs(SensorValue[leftshaft]) < rotations) {
 
 			int error = rotations - abs(SensorValue[leftshaft]);
 
-			leftpower = error / 2;
+			leftpower = error / 4;
 			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
@@ -288,7 +291,7 @@ void turnRightWithSensor(int rotations) {
 
 			int error = rotations - abs(SensorValue[rightshaft]);
 
-			rightpower = error / 2;
+			rightpower = error / 4;
 			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
@@ -338,15 +341,14 @@ void moveBackwardWithSensor(int rotations) {
 	int rightmultiplier = 1;
 	float slowdown = .98;
 	int buffer = 10;
-	while ((abs(SensorValue[leftshaft]) < rotations) ||
-		(abs(SensorValue[rightshaft]) < rotations)) {
+	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/2 < rotations * SLEW_OFFSET) {
 		int leftpower = 0;
 		int rightpower = 0;
 		if (abs(SensorValue[leftshaft]) < rotations) {
 
 			int error = rotations - abs(SensorValue[leftshaft]);
 
-			leftpower = error / 2;
+			leftpower = error / 4;
 			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
@@ -357,7 +359,7 @@ void moveBackwardWithSensor(int rotations) {
 
 			int error = rotations - abs(SensorValue[rightshaft]);
 
-			rightpower = error / 2;
+			rightpower = error / 4;
 			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
@@ -401,15 +403,14 @@ void turnLeftWithSensor(int rotations) {
 	int rightmultiplier = 1;
 	float slowdown = .98;
 	int buffer = 10;
-	while ((abs(SensorValue[leftshaft]) < rotations) ||
-		(abs(SensorValue[rightshaft]) < rotations)) {
+	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/2 < rotations * SLEW_OFFSET) {
 		int leftpower = 0;
 		int rightpower = 0;
 		if (abs(SensorValue[leftshaft]) < rotations) {
 
 			int error = rotations - abs(SensorValue[leftshaft]);
 
-			leftpower = error / 2;
+			leftpower = error / 4;
 			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
@@ -420,7 +421,7 @@ void turnLeftWithSensor(int rotations) {
 
 			int error = rotations - abs(SensorValue[rightshaft]);
 
-			rightpower = error / 2;
+			rightpower = error / 4;
 			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
@@ -543,18 +544,18 @@ task usercontrol() {
 
 
 		}
-		if(vexRT[Btn6U] == 1)
-		{
-			stallhang = true;
-		}
-		else if(vexRT[Btn6D] == 1)
-		{
-			stallhang = false;
-		}
+/*		//if(vexRT[Btn6U] == 1)
+		//{
+			//stallhang = true;
+		//}
+		//else if(vexRT[Btn6D] == 1)
+		//{
+		//	stallhang = false;
+		//}
 
-		if(vexRT[Btn7U] == 1)
-		{
-			motorReq[hang] = 127;
+		//if(vexRT[Btn7U] == 1)
+		//{
+			//motorReq[hang] = 127;
 
 			if(SensorValue[hangtoplimit] == 1)
 			{
@@ -574,7 +575,7 @@ task usercontrol() {
 				motorReq[hang] = 0;
 			}
 		}
-
+*/
 		if(vexRT[Btn8U] == 1)
 		{
 			SensorValue[leftshaft] = 0;
