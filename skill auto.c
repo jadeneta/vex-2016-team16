@@ -1,41 +1,52 @@
 void autoskill() {
-
+turnLeftWithSensor(TURNLEFT_90);
+/*int fieldlength = 1500;
 	clawtarget = 2625;
 	liftarm();
 	waitforarmheight(ARM_HIGH-150);
-	// goes forward while lifting arm and closing
-	//turnleft(127);
 	wait1Msec(1000);
 	closeclaw();
 	wait1Msec(500);
-	//turnleft(0);
-	// move forward to hit stars off wall
-	moveForwardWithSensor(1350);
+	moveForwardWithSensor(fieldlength);
 	clawtarget = 2000;
 	wait1Msec(750);
+	//release first stars
 	openclaw();
-	moveBackwardWithSensor(1200);
+	wait1Msec(1000);
+	moveBackwardWithSensor(fieldlength);
 	clawtarget = 2625;
-	wait1Msec(1000);
-	moveForwardWithSensor(1350);
+	wait1Msec(2500);
+	moveForwardWithSensor(fieldlength);
+	// release second stars
 	openclaw();
+	wait1Msec(1000);
+	moveBackwardWithSensor(fieldlength);
+	//waiting for first cube
+	wait1Msec(1000);
+	closeclaw();
+	wait1Msec(1000);
+	moveForwardWithSensor(fieldlength);
+	// release cube
+	openclaw();
+	wait1Msec(1000);
 
+	moveBackwardWithSensor(fieldlength);
 
-	moveBackwardWithSensor(1200);
+	//wait for second cube
 	wait1Msec(1000);
 	closeclaw();
 	wait1Msec(500);
-	moveForwardWithSensor(1350);
+	moveForwardWithSensor(fieldlength);
+	// release 2nd cube
 	openclaw();
-	wait1Msec(500);
-	openclaw();
+  wait1Msec(1000);
+  moveBackwardWithSensor(500);
+  turnRightWithSensor(TURNRIGHT_90 );
+  droparm();
+  clawtarget = 2000;
+  wait1Msec(800);
+  moveForwardWithSensor(800);
+  closeclaw();
 
-	moveBackwardWithSensor(1200);
-	wait1Msec(1000);
-	closeclaw();
-	wait1Msec(500);
-	moveForwardWithSensor(1350);
-	openclaw();
-
-
+*/
 }

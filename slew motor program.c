@@ -5,7 +5,7 @@
 #define MOTOR_FAST_SLEW_RATE    256     // essentially off
 #define MOTOR_TASK_DELAY        15      // task 1/frequency in mS (about 66Hz)
 #define MOTOR_DEADBAND          10
-
+#define SKIP_MOTOR 							1000
 // Array to hold requested speed for the motors
 int motorReq[ MOTOR_NUM ];
 
@@ -37,11 +37,15 @@ task MotorSlewRateTask()
         }
 
     // run task until stopped
+
     while( true )
         {
         // run loop for every motor
+
         for( motorIndex=0; motorIndex<MOTOR_NUM; motorIndex++)
             {
+            	if( motorReq[motorIndex] == SKIP_MOTOR)
+            		continue;
             // So we don't keep accessing the internal storage
             motorTmp = motor[ motorIndex ];
 
