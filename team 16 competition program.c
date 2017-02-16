@@ -27,13 +27,12 @@
 #pragma userControlDuration(900)
 #include "Vex_Competition_Includes.c" //Main competition background code...do not modify!
 #include "slew motor program.c"
-int clawtarget = 1000;
 const int ARM_LOW = 720;
 int armtarget = ARM_LOW;
 bool clawhold = false;
 bool lifthold = false;
-const int CLAW_CLOSE = 2780;
-const int ClAW_OPEN = 1200;
+const int CLAW_CLOSE = 1000;
+const int CLAW_OPEN = 2600;
 const int ARM_HIGH = 2650;
 const int TURNRIGHT_90 = 250;
 const int TURNLEFT_90 = 250;
@@ -41,15 +40,16 @@ const float SLEW_OFFSET = .8;
 const int MAXPOWER = 100;
 const float P_FACTOR = .2;
 const int WAIT_FOR_STOP = 100;
+int clawtarget = CLAW_OPEN;
 /////////////////////////////////////////////////////////////////////////////////////////
-// 																																										 /
-//                          Pre-Autonomous Functions       												    /
-//       																																						 /
-// You may want to perform some actions before the competition starts. Do them      /
-// in the																																					 /
-// following function.																														/
-//																																							 /
-/////////////////////////////////////////////////////////////////////////////////
+/////																																							  /////
+////                          Pre-Autonomous Functions       												 ////
+///       																																						///
+// You may want to perform some actions before the competition starts. Do them         //
+/// in the																																					  ///
+//// following function.																														 ////
+/////																																							  /////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 void pre_auton() {
 	SensorValue[skill_led] = 0;
@@ -73,22 +73,21 @@ int max(int a, int b) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-//                                                                                     /
-//                                 Autonomous Task                                    /
-//                                                                                   /
-// This task is used to control your robot during the autonomous phase of a VEX     /
-// Competition.                 n           																			 /
-// You must modify the code to add your own robot specific commands here.					/
-//																																							 /
-/////////////////////////////////////////////////////////////////////////////////
-task claw_Control()
-{
+/////                                                                               /////
+////                                 Autonomous Task                                 ////
+///                                                                                   ///
+// This task is used to control your robot during the autonomous phase of a VEX        //
+/// Competition.                 n           																			    ///
+//// You must modify the code to add your own robot specific commands here.					 ////
+/////																																							  /////
+/////////////////////////////////////////////////////////////////////////////////////////
+task claw_Control() {
 	int previous_value=0;
 	int clawholdpower=0;
 	int maxholdpower=30;
 	while (true) {
-		if(clawtarget < CLAW_OPEN) clawtarget = CLAW_OPEN;
-		if(clawtarget > CLAW_CLOSE) clawtarget = CLAW_CLOSE;
+		if(clawtarget > CLAW_OPEN) clawtarget = CLAW_OPEN;
+		if(clawtarget < CLAW_CLOSE) clawtarget = CLAW_CLOSE;
 		int currentvalue = SensorValue[clawSensor];
 		int clawerror = clawtarget - abs(currentvalue);
 		int clawpower = clawerror / 5;
@@ -235,7 +234,7 @@ void moveForwardWithSensor(int rotations) {
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
 				leftpower = min_leftpower;
-			leftpower = min(MAXPOWER, leftpower)
+			leftpower = min(MAXPOWER, leftpower);
 		}
 		if (SensorValue[rightshaft] < rotations) {
 
@@ -246,7 +245,8 @@ void moveForwardWithSensor(int rotations) {
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
 				rightpower = min_rightpower;
-			rightpower = min(MAXPOWER, rightpower)
+			rightpower = min(MAXPOWER, rightpower);
+			\
 		}
 		// left sensor moving too fast
 		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
@@ -268,7 +268,7 @@ void moveForwardWithSensor(int rotations) {
 		}
 
 		moveforward_left(leftpower * leftmultiplier);
-		moveforward_right(rightpower * rightmultiplier * 1.15;
+		moveforward_right(rightpower * rightmultiplier * 1.15);
 		lastSensorValueLeft = abs(SensorValue[leftshaft]);
 		lastSensorValueRight = abs(SensorValue[rightshaft]);
 		wait1Msec(MOTOR_TASK_DELAY);
@@ -285,8 +285,6 @@ void turnRightWithSensor(int rotations) {
 	int lastSensorValueLeft = 0;
 	int leftmultiplier = 1;
 	int rightmultiplier = 1;
-	float slowdown = .98;
-	int buffer = 10;
 	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/ 2 < rotations * SLEW_OFFSET) {
 		int leftpower = 0;
 		int rightpower = 0;
@@ -299,7 +297,7 @@ void turnRightWithSensor(int rotations) {
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
 				leftpower = min_leftpower;
-			leftpower = min(MAXPOWER, leftpower)
+			leftpower = min(MAXPOWER, leftpower);
 		}
 		if (abs(SensorValue[rightshaft]) < rotations) {
 
@@ -310,7 +308,7 @@ void turnRightWithSensor(int rotations) {
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
 				rightpower = min_rightpower;
-			rightpower = min(MAXPOWER, rightpower)
+			rightpower = min(MAXPOWER, rightpower);
 		}
 		// left sensor moving too fast
 		/*		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
@@ -368,7 +366,7 @@ void moveBackwardWithSensor(int rotations) {
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
 				leftpower = min_leftpower;
-			leftpower = min(MAXPOWER, leftpower)
+			leftpower = min(MAXPOWER, leftpower);
 		}
 		if (abs(SensorValue[rightshaft]) < rotations) {
 
@@ -379,7 +377,7 @@ void moveBackwardWithSensor(int rotations) {
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
 				rightpower = min_rightpower;
-			rightpower = min(MAXPOWER, rightpower)
+			rightpower = min(MAXPOWER, rightpower);
 		}
 		// left sensor moving too fast
 		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
@@ -417,8 +415,6 @@ void turnLeftWithSensor(int rotations) {
 	int lastSensorValueRight = 0;
 	int leftmultiplier = 1;
 	int rightmultiplier = 1;
-	float slowdown = .98;
-	int buffer = 10;
 	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/2 < rotations * SLEW_OFFSET) {
 		int leftpower = 0;
 		int rightpower = 0;
@@ -431,7 +427,7 @@ void turnLeftWithSensor(int rotations) {
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
 				leftpower = min_leftpower;
-			leftpower = min(MAXPOWER, leftpower)
+			leftpower = min(MAXPOWER, leftpower);
 		}
 		if (abs(SensorValue[rightshaft]) < rotations) {
 
@@ -442,7 +438,7 @@ void turnLeftWithSensor(int rotations) {
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
 				rightpower = min_rightpower;
-			rightpower = min(MAXPOWER, rightpower)
+			rightpower = min(MAXPOWER, rightpower);
 		}
 		// left sensor moving too fast
 		/*		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
@@ -525,22 +521,14 @@ task usercontrol() {
 	armtarget = ARM_LOW + 100;
 	startTask(claw_Control);
 	startTask(MotorSlewRateTask);
-	int clawOpenSpeed = 127;
-	int clawCloseSpeed = 127;
-	int clawGrabSpeed = 100;
-	bool stallhang = false;
 	lifthold = false;
 	SensorValue[leftshaft] = 0;
 	SensorValue[skill] = 0;
 	SensorValue[rightauto] = 0;
 	int clawspeed = 0;
 	int arm = 0;
-	int armerror = 0;
 	armtarget = 40;
 	while (true) {
-		int clawSensorValue = SensorValue[clawSensor];
-		int liftSensorValue = SensorValue[liftSensor];
-		int backwheelspeed = 0;
 		int leftBspeed = 0;
 		int leftFspeed = 0;
 		int rightFspeed = 0;
@@ -605,12 +593,12 @@ task usercontrol() {
 		}
 		// Close Claw
 		if (vexRT[Btn8UXmtr2] == 1) {
-			clawtarget = min(CLAW_CLOSE, clawtarget + 25);
+			clawtarget = max(CLAW_CLOSE, clawtarget - 25);
 			clawhold = false;
 		}
 		// Open Claw
 		else if (vexRT[Btn8DXmtr2] == 1) {
-			clawtarget = max(ClAW_OPEN, clawtarget - 25);
+			clawtarget = min(CLAW_OPEN, clawtarget + 25);
 			clawhold = false;
 
 			} else {

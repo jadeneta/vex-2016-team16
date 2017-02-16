@@ -7,7 +7,7 @@ void autoright()
 	moveForwardWithSensor(600);
 
 	wait1Msec(500);
-	turnLeftWithSensor(200)
+	turnLeftWithSensor(200);
 	moveForwardWithSensor(400);
 	closeclaw();
 	wait1Msec(500);

@@ -1,17 +1,17 @@
 void autoleft()
 {
- clawtarget = 2250;
- turnrightwithsensor(TURNRIGHT_90-5);
- moveforwardwithsensor(1200);
+ clawtarget = 1400;
+turnRightWithSensor(TURNRIGHT_90-5);
+moveForwardWithSensor(1200);
  closeclaw();
  wait1Msec(500);
  liftarm();
- movebackwardwithsensor(1100);
- turnleftwithsensor(TURNLEFT_90 +20);
- moveforwardwithsensor(1500);
+moveBackwardWithSensor(1100);
+turnLeftWithSensor(TURNLEFT_90 +20);
+moveForwardWithSensor(1500);
  openclaw();
  wait1Msec(500);
- movebackwardwithsensor(800);
+moveBackwardWithSensor(800);
  turnRightWithSensor(230);
  droparm();
  wait1Msec(500);
