@@ -35,21 +35,21 @@ bool lifthold = false;
 const int CLAW_CLOSE = 2780;
 const int ClAW_OPEN = 1200;
 const int ARM_HIGH = 2650;
-const int TURNRIGHT_90 = 315;
-const int TURNLEFT_90 = 315;
+const int TURNRIGHT_90 = 250;
+const int TURNLEFT_90 = 250;
 const float SLEW_OFFSET = .8;
 const int MAXPOWER = 100;
 const float P_FACTOR = .2;
 const int WAIT_FOR_STOP = 100;
 /////////////////////////////////////////////////////////////////////////////////////////
-//
-//                          Pre-Autonomous Functions
-//
-// You may want to perform some actions before the competition starts. Do them
-// in the
-// following function.
-//
-/////////////////////////////////////////////////////////////////////////////////////////
+// 																																										 /
+//                          Pre-Autonomous Functions       												    /
+//       																																						 /
+// You may want to perform some actions before the competition starts. Do them      /
+// in the																																					 /
+// following function.																														/
+//																																							 /
+/////////////////////////////////////////////////////////////////////////////////
 
 void pre_auton() {
 	SensorValue[skill_led] = 0;
@@ -81,7 +81,11 @@ int max(int a, int b) {
 // You must modify the code to add your own robot specific commands here.					/
 //																																							 /
 /////////////////////////////////////////////////////////////////////////////////
-task claw_Control() {
+task claw_Control()
+{
+	int previous_value=0;
+	int clawholdpower=0;
+	int maxholdpower=30;
 	while (true) {
 		if(clawtarget < CLAW_OPEN) clawtarget = CLAW_OPEN;
 		if(clawtarget > CLAW_CLOSE) clawtarget = CLAW_CLOSE;
@@ -99,9 +103,16 @@ task claw_Control() {
 		{
 			clawpower = 0;
 		}
-		motorReq[leftclaw] = clawpower;
-		motorReq[rightclaw] = clawpower;
-
+		if (abs(currentvalue)-abs(previous_value)<10){
+			if (clawholdpower<maxholdpower)
+				clawholdpower+=10;
+		}
+		else{
+			clawholdpower=0;
+		}
+		motorReq[leftclaw] = clawpower+clawholdpower;
+		motorReq[rightclaw] = clawpower+clawholdpower;
+		previous_value=currentvalue;
 		wait1Msec(MOTOR_TASK_DELAY);
 	}
 }
@@ -129,12 +140,12 @@ task arm_Control() {
 			}
 			if (abs(arm) < 20)
 				arm = 0;
-			if (arm < -60)
-				arm = -60;
+			if (arm < -20)
+				arm = -20;
 			motorReq[rightlift] = arm;
 			motorReq[leftlift] = arm;
 		}
-		wait1Msec(MOTOR_TASK_DELAY);k
+		wait1Msec(MOTOR_TASK_DELAY);
 	}
 }
 void autoleft();
@@ -268,8 +279,8 @@ void moveForwardWithSensor(int rotations) {
 void turnRightWithSensor(int rotations) {
 	SensorValue[leftshaft] = 0;
 	SensorValue[rightshaft] = 0;
-	int min_rightpower = 40;
-	int min_leftpower = 40;
+	int min_rightpower = 35;
+	int min_leftpower = 35;
 	int lastSensorValueRight = 0;
 	int lastSensorValueLeft = 0;
 	int leftmultiplier = 1;
@@ -400,8 +411,8 @@ void moveBackwardWithSensor(int rotations) {
 void turnLeftWithSensor(int rotations) {
 	SensorValue[leftshaft] = 0;
 	SensorValue[rightshaft] = 0;
-	int min_leftpower = 40;
-	int min_rightpower = 40;
+	int min_leftpower = 35;
+	int min_rightpower = 35;
 	int lastSensorValueLeft = 0;
 	int lastSensorValueRight = 0;
 	int leftmultiplier = 1;
