@@ -38,8 +38,9 @@ const int ARM_HIGH = 2650;
 const int TURNRIGHT_90 = 315;
 const int TURNLEFT_90 = 315;
 const float SLEW_OFFSET = .8;
-const int MAXPOWER = 75;
-const float P_FACTOR = .125;
+const int MAXPOWER = 100;
+const float P_FACTOR = .2;
+const int WAIT_FOR_STOP = 100;
 /////////////////////////////////////////////////////////////////////////////////////////
 //
 //                          Pre-Autonomous Functions
@@ -76,10 +77,10 @@ int max(int a, int b) {
 //                                 Autonomous Task                                    /
 //                                                                                   /
 // This task is used to control your robot during the autonomous phase of a VEX     /
-// Competition.                 n
-// You must modify the code to add your own robot specific commands here.
-//
-/////////////////////////////////////////////////////////////////////////////////////////
+// Competition.                 n           																			 /
+// You must modify the code to add your own robot specific commands here.					/
+//																																							 /
+/////////////////////////////////////////////////////////////////////////////////
 task claw_Control() {
 	while (true) {
 		if(clawtarget < CLAW_OPEN) clawtarget = CLAW_OPEN;
@@ -133,7 +134,7 @@ task arm_Control() {
 			motorReq[rightlift] = arm;
 			motorReq[leftlift] = arm;
 		}
-		wait1Msec(MOTOR_TASK_DELAY);
+		wait1Msec(MOTOR_TASK_DELAY);k
 	}
 }
 void autoleft();
@@ -256,19 +257,19 @@ void moveForwardWithSensor(int rotations) {
 		}
 
 		moveforward_left(leftpower * leftmultiplier);
-		moveforward_right(rightpower * rightmultiplier );
+		moveforward_right(rightpower * rightmultiplier * 1.15;
 		lastSensorValueLeft = abs(SensorValue[leftshaft]);
 		lastSensorValueRight = abs(SensorValue[rightshaft]);
 		wait1Msec(MOTOR_TASK_DELAY);
 	}
 	moveforward(0);
-	wait1Msec(300);
+	wait1Msec(WAIT_FOR_STOP);
 }
 void turnRightWithSensor(int rotations) {
 	SensorValue[leftshaft] = 0;
 	SensorValue[rightshaft] = 0;
-	int min_rightpower = 25;
-	int min_leftpower = 25;
+	int min_rightpower = 40;
+	int min_leftpower = 40;
 	int lastSensorValueRight = 0;
 	int lastSensorValueLeft = 0;
 	int leftmultiplier = 1;
@@ -301,23 +302,23 @@ void turnRightWithSensor(int rotations) {
 			rightpower = min(MAXPOWER, rightpower)
 		}
 		// left sensor moving too fast
-		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
+		/*		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
 		{
-			rightmultiplier = 1;
-			leftmultiplier = leftmultiplier * slowdown;
+		rightmultiplier = 1;
+		leftmultiplier = leftmultiplier * slowdown;
 		}
 		else if (abs(SensorValue[rightshaft]) > abs(SensorValue[leftshaft]) + buffer)
 		{
-			leftmultiplier = 1;
-			rightmultiplier = rightmultiplier * slowdown;
-			//right sensor moving too fast
+		leftmultiplier = 1;
+		rightmultiplier = rightmultiplier * slowdown;
+		//right sensor moving too fast
 
 		}
 		else
 		{
-			rightmultiplier = 1;
-			leftmultiplier = 1;
-		}
+		rightmultiplier = 1;
+		leftmultiplier = 1;
+		*///	}
 		turnright_left(leftpower * leftmultiplier);
 		turnright_right(rightpower * rightmultiplier);
 		lastSensorValueLeft = abs(SensorValue[leftshaft]);
@@ -325,7 +326,7 @@ void turnRightWithSensor(int rotations) {
 		wait1Msec(MOTOR_TASK_DELAY);
 	}
 	turnright(0);
-	wait1Msec(300);
+	wait1Msec(WAIT_FOR_STOP);
 }
 void waitforarmheight(int height)
 {
@@ -394,13 +395,13 @@ void moveBackwardWithSensor(int rotations) {
 		wait1Msec(MOTOR_TASK_DELAY);
 	}
 	movebackward(0);
-	wait1Msec(300);
+	wait1Msec(WAIT_FOR_STOP);
 }
 void turnLeftWithSensor(int rotations) {
 	SensorValue[leftshaft] = 0;
 	SensorValue[rightshaft] = 0;
-	int min_leftpower = 25;
-	int min_rightpower = 25;
+	int min_leftpower = 40;
+	int min_rightpower = 40;
 	int lastSensorValueLeft = 0;
 	int lastSensorValueRight = 0;
 	int leftmultiplier = 1;
@@ -433,31 +434,31 @@ void turnLeftWithSensor(int rotations) {
 			rightpower = min(MAXPOWER, rightpower)
 		}
 		// left sensor moving too fast
-		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
+		/*		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
 		{
-			rightmultiplier = 1;
-			leftmultiplier = leftmultiplier * slowdown;
+		rightmultiplier = 1;
+		leftmultiplier = leftmultiplier * slowdown;
 		}
 		else if (abs(SensorValue[rightshaft]) > abs(SensorValue[leftshaft]) + buffer)
 		{
-			leftmultiplier = 1;
-			rightmultiplier = rightmultiplier * slowdown;
-			//right sensor moving too fast
+		leftmultiplier = 1;
+		rightmultiplier = rightmultiplier * slowdown;
+		//right sensor moving too fast
 
 		}
 		else
 		{
-			rightmultiplier = 1;
-			leftmultiplier = 1;
+		rightmultiplier = 1;
+		leftmultiplier = 1;
 		}
-		turnleft_left(leftpower * leftmultiplier);
+		*/	turnleft_left(leftpower * leftmultiplier);
 		turnleft_right(rightpower * rightmultiplier);
 		lastSensorValueLeft = abs(SensorValue[leftshaft]);
 		lastSensorValueRight = abs(SensorValue[rightshaft]);
 		wait1Msec(MOTOR_TASK_DELAY);
 	}
 	turnleft(0);
-	wait1Msec(300);
+	wait1Msec(WAIT_FOR_STOP);
 }
 task autonomous() {
 	startTask(MotorSlewRateTask);
@@ -554,9 +555,9 @@ task usercontrol() {
 
 
 		}
-/*		//if(vexRT[Btn6U] == 1)
+		/*		//if(vexRT[Btn6U] == 1)
 		//{
-			//stallhang = true;
+		//stallhang = true;
 		//}
 		//else if(vexRT[Btn6D] == 1)
 		//{
@@ -565,27 +566,27 @@ task usercontrol() {
 
 		//if(vexRT[Btn7U] == 1)
 		//{
-			//motorReq[hang] = 127;
+		//motorReq[hang] = 127;
 
-			if(SensorValue[hangtoplimit] == 1)
-			{
-				motorReq[hang] = 0;
-			}
+		if(SensorValue[hangtoplimit] == 1)
+		{
+		motorReq[hang] = 0;
+		}
 		} else if(vexRT[Btn7D] == 1)
 		{
-			motorReq[hang] = -127;
+		motorReq[hang] = -127;
 
 		} else
 		{
-			if(stallhang)
-			{
-				motorReq[hang] = 30;
-			} else
-			{
-				motorReq[hang] = 0;
-			}
+		if(stallhang)
+		{
+		motorReq[hang] = 30;
+		} else
+		{
+		motorReq[hang] = 0;
 		}
-*/
+		}
+		*/
 		if(vexRT[Btn8U] == 1)
 		{
 			SensorValue[leftshaft] = 0;
