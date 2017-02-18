@@ -38,6 +38,7 @@ const int TURNRIGHT_90 = 250;
 const int TURNLEFT_90 = 250;
 const float SLEW_OFFSET = .8;
 const int MAXPOWER = 100;
+const int TURN_MAXPOWER = 60;
 const float P_FACTOR = .2;
 const int WAIT_FOR_STOP = 200;
 const int MAX_CLAW = 3900;
@@ -288,8 +289,8 @@ void moveForwardWithSensor(int rotations) {
 void turnRightWithSensor(int rotations) {
 	SensorValue[leftshaft] = 0;
 	SensorValue[rightshaft] = 0;
-	int min_rightpower = 35;
-	int min_leftpower = 35;
+	int min_rightpower = 40;
+	int min_leftpower = 40;
 	int lastSensorValueRight = 0;
 	int lastSensorValueLeft = 0;
 	int leftmultiplier = 1;
@@ -302,22 +303,22 @@ void turnRightWithSensor(int rotations) {
 			int error = rotations - abs(SensorValue[leftshaft]);
 
 			leftpower = error * P_FACTOR;
-			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+			if (lastSensorValueLeft > 0 && abs(SensorValue[leftshaft]) == lastSensorValueLeft)
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
 				leftpower = min_leftpower;
-			leftpower = min(MAXPOWER, leftpower);
+			leftpower = min(TURN_MAXPOWER, leftpower);
 		}
 		if (abs(SensorValue[rightshaft]) < rotations) {
 
 			int error = rotations - abs(SensorValue[rightshaft]);
 
 			rightpower = error * P_FACTOR;
-			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+			if (lastSensorValueRight > 0 && abs(SensorValue[rightshaft]) == lastSensorValueRight)
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
 				rightpower = min_rightpower;
-			rightpower = min(MAXPOWER, rightpower);
+			rightpower = min(TURN_MAXPOWER, rightpower);
 		}
 		// left sensor moving too fast
 		/*		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
@@ -418,8 +419,8 @@ void moveBackwardWithSensor(int rotations) {
 void turnLeftWithSensor(int rotations) {
 	SensorValue[leftshaft] = 0;
 	SensorValue[rightshaft] = 0;
-	int min_leftpower = 35;
-	int min_rightpower = 35;
+	int min_leftpower = 40;
+	int min_rightpower = 40;
 	int lastSensorValueLeft = 0;
 	int lastSensorValueRight = 0;
 	int leftmultiplier = 1;
@@ -432,22 +433,22 @@ void turnLeftWithSensor(int rotations) {
 			int error = rotations - abs(SensorValue[leftshaft]);
 
 			leftpower = error * P_FACTOR;
-			if (abs(SensorValue[leftshaft]) == lastSensorValueLeft)
+			if (lastSensorValueLeft > 0 && abs(SensorValue[leftshaft]) == lastSensorValueLeft)
 				min_leftpower += 5;
 			if (leftpower < min_leftpower)
 				leftpower = min_leftpower;
-			leftpower = min(MAXPOWER, leftpower);
+			leftpower = min(TURN_MAXPOWER, leftpower);
 		}
 		if (abs(SensorValue[rightshaft]) < rotations) {
 
 			int error = rotations - abs(SensorValue[rightshaft]);
 
 			rightpower = error * P_FACTOR;
-			if (abs(SensorValue[rightshaft]) == lastSensorValueRight)
+			if (lastSensorValueRight > 0 && abs(SensorValue[rightshaft]) == lastSensorValueRight)
 				min_rightpower += 5;
 			if (rightpower < min_rightpower)
 				rightpower = min_rightpower;
-			rightpower = min(MAXPOWER, rightpower);
+			rightpower = min(TURN_MAXPOWER, rightpower);
 		}
 		// left sensor moving too fast
 		/*		if (abs(SensorValue[leftshaft]) > abs(SensorValue[rightshaft]) + buffer)
