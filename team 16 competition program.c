@@ -92,35 +92,35 @@ task claw_Control() {
 	while (true) {
 		if(clawhold)
 		{
-	//	if(clawtarget > MAX_CLAW) clawtarget = MAX_CLAW;
-		if(clawtarget < CLAW_CLOSE) clawtarget = CLAW_CLOSE;
-		int currentvalue = SensorValue[clawSensor];
-		int clawerror = clawtarget - abs(currentvalue);
-		int clawpower = clawerror / 5;
-		if (clawpower > 127) {
-			clawpower = 127;
+			//	if(clawtarget > MAX_CLAW) clawtarget = MAX_CLAW;
+			if(clawtarget < CLAW_CLOSE) clawtarget = CLAW_CLOSE;
+			int currentvalue = SensorValue[clawSensor];
+			int clawerror = clawtarget - abs(currentvalue);
+			int clawpower = clawerror / 5;
+			if (clawpower > 127) {
+				clawpower = 127;
+			}
+			if (clawpower < -127)
+			{
+				clawpower = -127;
+			}
+			if (abs(clawpower) < 20)
+			{
+				clawpower = 0;
+			}
+			if (abs(currentvalue)-abs(previous_value)<10){
+				if (clawholdpower<maxholdpower)
+					clawholdpower+=10;
+			}
+			else{
+				clawholdpower=0;
+			}
+			motorReq[leftclaw] = clawpower+clawholdpower;
+			motorReq[rightclaw] = clawpower+clawholdpower;
+			previous_value=currentvalue;
+			wait1Msec(MOTOR_TASK_DELAY);
 		}
-		if (clawpower < -127)
-		{
-			clawpower = -127;
-		}
-		if (abs(clawpower) < 20)
-		{
-			clawpower = 0;
-		}
-		if (abs(currentvalue)-abs(previous_value)<10){
-			if (clawholdpower<maxholdpower)
-				clawholdpower+=10;
-		}
-		else{
-			clawholdpower=0;
-		}
-		motorReq[leftclaw] = clawpower+clawholdpower;
-		motorReq[rightclaw] = clawpower+clawholdpower;
-		previous_value=currentvalue;
-		wait1Msec(MOTOR_TASK_DELAY);
 	}
-}
 }
 task arm_Control() {
 	int arm = 0;
@@ -227,8 +227,8 @@ void moveForwardWithSensor(int rotations) {
 	int buffer = 20;
 	float slowdown = .98;
 
- moveforward_right(80);
-  wait1Msec(50);
+	moveforward_right(80);
+	wait1Msec(50);
 
 	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/2 < rotations * SLEW_OFFSET)	 {
 		int leftpower = 0;
@@ -500,11 +500,11 @@ void auto() {
 		autoskill();
 		} else if (SensorValue[rightauto] == 1) {
 		autoright();
-		} else if(SensorValue[worseauto] == 1)
-		{
-			autoworse();
-			}
-			else{
+	} else if(SensorValue[worseauto] == 1)
+	{
+		autoworse();
+	}
+	else{
 		autoleft();
 	}
 }
@@ -517,11 +517,11 @@ void auto() {
 #include "right auto.c"
 void autoworse()
 {
-armtarget = 2400;
-openclaw();
-moveForwardWithSensor(1500);
-wait1Msec(500);
-moveBackwardWithSensor(500);
+	armtarget = 2400;
+	openclaw();
+	moveForwardWithSensor(1500);
+	wait1Msec(500);
+	moveBackwardWithSensor(500);
 
 
 }
@@ -634,10 +634,10 @@ task usercontrol() {
 
 
 		}
-     	if (vexRT[Btn5DXmtr2] == 1)
-			{
-		armtarget = LOWFENCE;
-		lifthold = true;
+		if (vexRT[Btn5DXmtr2] == 1)
+		{
+			armtarget = LOWFENCE;
+			lifthold = true;
 		}
 		// Lift
 		if (vexRT[Btn5UXmtr2] == 1) {
