@@ -3,8 +3,8 @@ void autoskill() {
 	int fieldlength = 1500;
 	closeclaw();
 	liftarm();
-	waitforarmheight(ARM_HIGH-600);
-	closeclaw();
+	waitForArmHeightAt(ARM_HIGH-600,1000);
+	//waiting for preload stars
 	wait1Msec(700);
 	moveForwardWithSensor(fieldlength);
 	//release first stars
@@ -62,7 +62,7 @@ void autoskill() {
 	wait1Msec(600);
 	moveBackwardWithSensor(100);
 	armtarget = 2400;
-	waitforarmheight(2000);
+	waitForArmHeightAt(2000, 700);
 	turnLeftWithSensor(TURNLEFT_90 + 75);
 	moveForwardWithSensor(300);
 	openclaw();

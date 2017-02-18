@@ -32,7 +32,8 @@ int armtarget = ARM_LOW;
 bool clawhold = false;
 bool lifthold = false;
 const int CLAW_CLOSE = 1000;
-const int CLAW_OPEN = 2600;
+const int CLAW_OPEN = 1500;
+const int CLAW_OPEN_WIDE = 2600;
 const int ARM_HIGH = 2650;
 const int TURNRIGHT_90 = 250;
 const int TURNLEFT_90 = 250;
@@ -347,12 +348,48 @@ void turnRightWithSensor(int rotations) {
 	turnright(0);
 	wait1Msec(WAIT_FOR_STOP);
 }
-void waitforarmheight(int height)
+void waitForArmHeightAt(int height,int maxTime)
 {
-	while (SensorValue[liftSensor] < height)
+	int maxloops = maxTime/MOTOR_TASK_DELAY;
+	int loopcount = 0;
+	while (SensorValue[liftSensor] < height && loopcount < maxloops)
+	{
+	 loopcount++;
 		wait1Msec(MOTOR_TASK_DELAY);
+	}
 }
+void waitForArmDroppedTo(int height, int maxTime)
+{
+	int maxloops = maxTime/MOTOR_TASK_DELAY;
+	int loopcount = 0;
+	while (SensorValue[liftSensor] > height && loopcount < maxloops)
+	{
+	 loopcount++;
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
+}
+void waitForClawClosedAt(int angle, int maxtime)
 
+{
+	int maxloops = maxtime/MOTOR_TASK_DELAY;
+	int loopcount = 0;
+	while (SensorValue[clawSensor] > angle && loopcount < maxloops)
+	{
+	 loopcount++;
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
+}
+void waitForClawOpenedAt(int angle, int maxtime)
+
+{
+	int maxloops = maxtime/MOTOR_TASK_DELAY;
+	int loopcount = 0;
+	while (SensorValue[clawSensor] < angle && loopcount < maxloops)
+	{
+	 loopcount++;
+		wait1Msec(MOTOR_TASK_DELAY);
+	}
+}
 void moveBackwardWithSensor(int rotations) {
 	SensorValue[leftshaft] = 0;
 	SensorValue[rightshaft] = 0;
@@ -626,7 +663,12 @@ task usercontrol() {
 			clawtarget = min(CLAW_OPEN, clawtarget + 25);
 			clawhold = true;
 
-			} else {
+			} else  if(vexRT[Btn8RXmtr2] == 1)
+			{
+		clawtarget = CLAW_OPEN_WIDE;
+		clawhold = true;
+		}
+		else {
 			// Grab and Hold
 			if (vexRT[Btn6UXmtr2] == 1) {
 				clawtarget = CLAW_CLOSE;
