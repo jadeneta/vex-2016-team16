@@ -1,5 +1,5 @@
 #define MOTOR_NUM               kNumbOfTotalMotors
-#define MOTOR_MAX_VALUE         127
+//#define MOTOR_MAX_VALUE         127
 #define MOTOR_MIN_VALUE         (-127)
 #define MOTOR_DEFAULT_SLEW_RATE 10      // Default will cause 375mS from full fwd to rev
 #define MOTOR_FAST_SLEW_RATE    256     // essentially off

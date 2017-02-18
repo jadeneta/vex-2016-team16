@@ -4,7 +4,7 @@
 #pragma config(Sensor, dgtl3,  leftshaft,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  right_led,      sensorLEDtoVCC)
 #pragma config(Sensor, dgtl6,  skill_led,      sensorLEDtoVCC)
-#pragma config(Sensor, dgtl10, hangtoplimit,   sensorTouch)
+#pragma config(Sensor, dgtl10, worseauto,      sensorTouch)
 #pragma config(Sensor, dgtl11, rightauto,      sensorTouch)
 #pragma config(Sensor, dgtl12, skill,          sensorTouch)
 #pragma config(Motor,  port1,           rightclaw,     tmotorVex393_HBridge, openLoop)
@@ -39,8 +39,12 @@ const int TURNLEFT_90 = 250;
 const float SLEW_OFFSET = .8;
 const int MAXPOWER = 100;
 const float P_FACTOR = .2;
-const int WAIT_FOR_STOP = 100;
-int clawtarget = CLAW_OPEN;
+const int WAIT_FOR_STOP = 200;
+const int MAX_CLAW = 3900;
+int clawtarget = MAX_CLAW;
+const int HIGHFENCE = 2400;
+const int LOWFENCE = 2100;
+
 /////////////////////////////////////////////////////////////////////////////////////////
 /////																																							  /////
 ////                          Pre-Autonomous Functions       												 ////
@@ -86,7 +90,9 @@ task claw_Control() {
 	int clawholdpower=0;
 	int maxholdpower=30;
 	while (true) {
-		if(clawtarget > CLAW_OPEN) clawtarget = CLAW_OPEN;
+		if(clawhold)
+		{
+	//	if(clawtarget > MAX_CLAW) clawtarget = MAX_CLAW;
 		if(clawtarget < CLAW_CLOSE) clawtarget = CLAW_CLOSE;
 		int currentvalue = SensorValue[clawSensor];
 		int clawerror = clawtarget - abs(currentvalue);
@@ -114,6 +120,7 @@ task claw_Control() {
 		previous_value=currentvalue;
 		wait1Msec(MOTOR_TASK_DELAY);
 	}
+}
 }
 task arm_Control() {
 	int arm = 0;
@@ -151,6 +158,7 @@ void autoleft();
 void autoskill();
 void autoright();
 void auto();
+void autoworse();
 void moveforward_right(int forward) {
 
 	motor[rightfrontwheel] = -forward;
@@ -216,10 +224,11 @@ void moveForwardWithSensor(int rotations) {
 	int lastSensorValueLeft = 0;
 	int leftmultiplier = 1;
 	int rightmultiplier = 1;
-	int buffer = 10;
+	int buffer = 20;
 	float slowdown = .98;
 
-
+ moveforward_right(80);
+  wait1Msec(50);
 
 	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/2 < rotations * SLEW_OFFSET)	 {
 		int leftpower = 0;
@@ -353,7 +362,7 @@ void moveBackwardWithSensor(int rotations) {
 	int leftmultiplier = 1;
 	int rightmultiplier = 1;
 	float slowdown = .98;
-	int buffer = 10;
+	int buffer = 20;
 	while ((abs(SensorValue[leftshaft])+ abs(SensorValue[rightshaft]))/2 < rotations * SLEW_OFFSET) {
 		int leftpower = 0;
 		int rightpower = 0;
@@ -486,11 +495,16 @@ void auto() {
 	droparm();
 	clawhold = true;
 	lifthold = true;
+	clawtarget = MAX_CLAW;
 	if (SensorValue[skill] == 1) {
 		autoskill();
 		} else if (SensorValue[rightauto] == 1) {
 		autoright();
-		} else {
+		} else if(SensorValue[worseauto] == 1)
+		{
+			autoworse();
+			}
+			else{
 		autoleft();
 	}
 }
@@ -501,6 +515,16 @@ void auto() {
 #include "left auto.c"
 #include "skill auto.c"
 #include "right auto.c"
+void autoworse()
+{
+armtarget = 2400;
+openclaw();
+moveForwardWithSensor(1500);
+wait1Msec(500);
+moveBackwardWithSensor(500);
+
+
+}
 
 
 
@@ -594,12 +618,12 @@ task usercontrol() {
 		// Close Claw
 		if (vexRT[Btn8UXmtr2] == 1) {
 			clawtarget = max(CLAW_CLOSE, clawtarget - 25);
-			clawhold = false;
+			clawhold = true;
 		}
 		// Open Claw
 		else if (vexRT[Btn8DXmtr2] == 1) {
 			clawtarget = min(CLAW_OPEN, clawtarget + 25);
-			clawhold = false;
+			clawhold = true;
 
 			} else {
 			// Grab and Hold
@@ -607,15 +631,18 @@ task usercontrol() {
 				clawtarget = CLAW_CLOSE;
 				clawhold = true;
 			}
-			if (!clawhold) {
-				clawspeed = 0;
-			}
-		}
 
+
+		}
+     	if (vexRT[Btn5DXmtr2] == 1)
+			{
+		armtarget = LOWFENCE;
+		lifthold = true;
+		}
 		// Lift
 		if (vexRT[Btn5UXmtr2] == 1) {
 			lifthold = true;
-			armtarget = 1500;
+			armtarget = HIGHFENCE;
 		}
 
 		if (vexRT[Btn7UXmtr2] == 1) {
@@ -634,10 +661,6 @@ task usercontrol() {
 			arm = 0;
 		}
 
-		if (vexRT[Btn5DXmtr2] == 1) {
-			arm = 0;
-			lifthold = false;
-		}
 
 		// keeps lift up a little to move around
 		/*

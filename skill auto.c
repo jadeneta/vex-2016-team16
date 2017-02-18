@@ -1,10 +1,9 @@
 void autoskill() {
 
 int fieldlength = 1500;
-	clawtarget = 1400;
+	closeclaw();
   liftarm();
 	waitforarmheight(ARM_HIGH-600);
-	wait1Msec(700);
 	closeclaw();
 	wait1Msec(700);
 	moveForwardWithSensor(fieldlength);
@@ -17,7 +16,7 @@ int fieldlength = 1500;
 		moveForwardWithSensor(400);
 		liftarm();
 	moveBackwardWithSensor(fieldlength);
-	clawtarget = 1400;
+	closeclaw();
 	wait1Msec(1500);
 	moveForwardWithSensor(fieldlength);
 	// release second stars
@@ -43,15 +42,17 @@ int fieldlength = 1500;
 	// release 2nd cube
 	openclaw();
   wait1Msec(1000);
-  moveBackwardWithSensor(400);
-  turnRightWithSensor(TURNRIGHT_90 - 30);
-  moveBackwardWithSensor(150);
-  clawtarget = 1400;
+  moveBackwardWithSensor(500);
+  turnRightWithSensor(TURNRIGHT_90 + 40);
+  moveBackwardWithSensor(350);
+  closeclaw();
   wait1Msec(700);
   droparm();
   wait1Msec(800);
+  clawtarget = 1400;
+  wait1Msec(500);
   // get 3 stars
-  moveForwardWithSensor(1300);
+  moveForwardWithSensor(1500);
 
   //moving away from fence
  turnright(75);
@@ -75,22 +76,24 @@ int fieldlength = 1500;
   openclaw();
  wait1Msec(1000);
  // grab cube in the middle
- moveForwardWithSensor(200);
+ moveForwardWithSensor(300);
 
  closeclaw();
  wait1Msec(1000);
  liftarm();
  wait1Msec(1000);
- turnRightWithSensor(TURNRIGHT_90 * 2);
- moveForwardWithSensor(300);
+ turnLeftWithSensor(TURNLEFT_90 * 2);
+ moveForwardWithSensor(500);
  openclaw();
  wait1Msec(500);
- moveBackwardWithSensor(300);
- turnRightWithSensor(TURNRIGHT_90 + 25);
- moveForwardWithSensor(1250);
-  armtarget = 2400;
+ moveBackwardWithSensor(600);
+ armtarget = 2400;
+ turnRightWithSensor(TURNRIGHT_90);
+ moveForwardWithSensor(1500);
  turnLeftWithSensor(TURNLEFT_90);
+
  moveForwardWithSensor(600);
+
 
 
 
